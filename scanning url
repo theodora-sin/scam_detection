@@ -1,1 +1,52 @@
+from flask import Flask, request, jsonify
+from flask_socketio import SocketIO, emit
+import requests
+import base64
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+# Your function to check URL using VirusTotal
+def check_url_virustotal(url):
+    api_key = "1df063fa64bd4070ca0a2a3c1c86a22d3fd5e6d4ddb59caf15fd78b84709879b"  # Replace with your actual API key
+    
+    # Base64 encode the URL
+    encoded_url = base64.urlsafe_b64encode(url.encode()).decode().strip("=")
+    
+    headers = {'x-apikey': api_key}
+    
+    # Make API request to VirusTotal
+    response = requests.get(f'https://www.virustotal.com/api/v3/urls/{encoded_url}', headers=headers)
+    result = response.json()
+    
+    if 'data' in result:
+        # Get the analysis stats to determine if the URL is safe or dangerous
+        analysis_stats = result['data']['attributes']['last_analysis_stats']
+        
+        # Check if the URL is dangerous or safe based on analysis stats
+        if analysis_stats['malicious'] > 0:
+            return {'status': 'dangerous', 'details': analysis_stats}
+        else:
+            return {'status': 'safe', 'details': analysis_stats}
+    else:
+        return {'status': 'error', 'details': 'Unable to fetch results'}
+
+# Route for scanning a URL
+@app.route('/scan_url', methods=['POST'])
+def scan_url():
+    url = request.json.get('url')
+    
+    if not url:
+        return jsonify({"status": "error", "message": "No URL provided"}), 400
+    
+    # Call the check_url function to get the scan result
+    result = check_url_virustotal(url)
+    
+    # Return the result as JSON
+    return jsonify(result)
+
+if __name__ == '__main__':
+    socketio.run(app, host='127.0.0.1', port=5000)
+
+
 
