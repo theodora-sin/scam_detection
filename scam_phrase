@@ -1,269 +1,190 @@
-import requests
 import re
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urljoin
-import socket 
-import ssl 
+import requests
+import socket
+import ssl
 import datetime
-from typing import Dict, List, Tuple 
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+from typing import Dict, List
 
-# FIXED: Added missing commas and quotes
-scam_phrases = [
-    # Urgency tactics
-    "urgent action required",
-    "act now or lose forever",
-    "limited time offer",
-    "expires today",
-    "immediate response required",
-    "time sensitive",
+# === Global Constants === #
 
-    # Prize/lottery scams
-    "claim your prize",
-    "congratulations! you have won",
-    "you've been selected",
-    "lottery winner",
-    "cash prize",
-    "free gift",
-    "free money",
+SCAM_PHRASES = [
+    # Urgency
+    "urgent action required", "act now or lose forever", "limited time offer", "expires today",
+    "immediate response required", "time sensitive",
     
-    # Personal information phishing
-    "confirm your personal information",
-    "verify your account",
-    "update your details",
-    "confirm your identity",
-    "security verification required",
-    "account suspended",
+    # Prize scams
+    "claim your prize", "congratulations! you have won", "you've been selected", "lottery winner",
+    "cash prize", "free gift", "free money",
     
-    # Financial scams
-    "wire transfer",
-    "send money",
-    "pay processing fee",
-    "tax refund",
-    "inheritance money",
-    "investment opportunity",
+    # Phishing
+    "confirm your personal information", "verify your account", "update your details",
+    "confirm your identity", "security verification required", "account suspended",
     
-    # Fake institutions - FIXED: Added missing comma and corrected quotes
-    "hsbc",
-    "hm office",
-    "google verification",  # Fixed spelling
-    "paypal security",
-    "amazon security",
-    "microsoft support",
-    "apple support",
-    "irs notice",
+    # Financial
+    "wire transfer", "send money", "pay processing fee", "tax refund", "inheritance money", "investment opportunity",
     
-    # Action phrases
-    "click to unlock",
-    "download now",
-    "install software",
-    "run this file",
-    "enable macros",
+    # Fake institutions
+    "hsbc", "hm office", "google verification", "paypal security", "amazon security",
+    "microsoft support", "apple support", "irs notice",
+    
+    # Action
+    "click to unlock", "download now", "install software", "run this file", "enable macros",
     
     # Emotional manipulation
-    "don't tell anyone",
-    "confidential matter",
-    "help me transfer money",
-    "i am dying",
-    "refugee",
-    "widow"
+    "don't tell anyone", "confidential matter", "help me transfer money", "i am dying", "refugee", "widow"
 ]
 
-# Suspicious domains and patterns
-suspicious_domains = [
-    "bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly",  # URL shorteners
+SUSPICIOUS_DOMAINS = [
+    "bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly",
     "secure-bank", "paypal-secure", "amazon-security", "microsoft-support",
     "apple-security", "google-verify", "facebook-security", "tk", "xyz"
 ]
 
-# Legitimate domain patterns
-legitimate_domains = [
+LEGITIMATE_DOMAINS = [
     "google.com", "microsoft.com", "apple.com", "amazon.com", "paypal.com",
-    "facebook.com", "twitter.com", "linkedin.com", "github.com", "stackoverflow.com",
-    "wikipedia.org", "reddit.com", "youtube.com", "gmail.com", "outlook.com"
+    "facebook.com", "twitter.com", "linkedin.com", "github.com",
+    "stackoverflow.com", "wikipedia.org", "reddit.com", "youtube.com",
+    "gmail.com", "outlook.com"
 ]
 
-def check_url_structure(url):
-    """FIXED version of check_url_v2"""
+
+# === URL Structure Checker === #
+
+def check_url_structure(url: str) -> Dict:
     try:
         parsed = urlparse(url)
-        domain = parsed.netloc.lower()
-        path = parsed.path.lower()
+        domain, path = parsed.netloc.lower(), parsed.path.lower()
+        suspicious_score, issues = 0, []
 
-        suspicious_score = 0
-        issues = []
-
-        # Check domain name length
         if len(domain) > 50:
             suspicious_score += 20
             issues.append("Unusually long domain name")
 
-        # Check for suspicious TLDs
         if re.search(r'[0-9]{4,}', domain):
             suspicious_score += 15
             issues.append("Domain contains many numbers")
-        
-        # Check for URL shorteners
-        for shortener in suspicious_domains:
-            if shortener in domain:
-                suspicious_score += 30
-                issues.append("Uses URL shortening service")
-        
-        # Check for suspicious subdomain patterns
-        subdomains = domain.split('.')
-        if len(subdomains) > 3:
+
+        if any(shortener in domain for shortener in SUSPICIOUS_DOMAINS):
+            suspicious_score += 30
+            issues.append("Uses URL shortening service")
+
+        if domain.count('.') > 2:
             suspicious_score += 10
             issues.append("Multiple subdomains")
 
-        # Check for homograph attacks
-        for legit_domain in legitimate_domains:
-            if is_similar_domain(domain, legit_domain):
+        for legit in LEGITIMATE_DOMAINS:
+            if is_similar_domain(domain, legit):
                 suspicious_score += 40
-                issues.append(f"Domain similar to legitimate site: {legit_domain}")
+                issues.append(f"Domain similar to {legit}")
 
-        # FIXED: Corrected suspicious path patterns
-        suspicious_path_patterns = [
-            'login', 'verify', 'secure', 'update', 'confirm', 'account',
-            'billing', 'payment', 'suspended', 'locked'
-        ]
-        
-        for pattern in suspicious_path_patterns:
+        suspicious_paths = ['login', 'verify', 'secure', 'update', 'confirm', 'account', 'billing', 'payment', 'suspended', 'locked']
+        for pattern in suspicious_paths:
             if pattern in path:
                 suspicious_score += 5
                 issues.append(f"Suspicious path contains: {pattern}")
-        
+
         return {
             'score': min(suspicious_score, 100),
             'issues': issues,
             'domain': domain,
-            'is_shortener': any(shortener in domain for shortener in suspicious_domains)
+            'is_shortener': any(shortener in domain for shortener in SUSPICIOUS_DOMAINS)
         }
-        
-    except Exception as e:
-        return {'score': 50, 'issues': [f"URL parsing error: {str(e)}"], 'domain': 'unknown'}
 
-def is_similar_domain(domain1: str, domain2: str) -> bool:
-    """Check if two domains are suspiciously similar"""
-    if abs(len(domain1) - len(domain2)) > 3:
-        return False
-    
-    d1 = re.sub(r'\.(com|org|net|edu|gov|mil)$', '', domain1)
-    d2 = re.sub(r'\.(com|org|net|edu|gov|mil)$', '', domain2)
-    
-    similarity = calculate_similarity(d1, d2)
-    return similarity > 0.8 and d1 != d2
+    except Exception as e:
+        return {'score': 50, 'issues': [f"URL parsing error: {e}"], 'domain': 'unknown'}
+
+
+def is_similar_domain(d1: str, d2: str) -> bool:
+    d1 = re.sub(r'\.(com|org|net|edu|gov|mil)$', '', d1)
+    d2 = re.sub(r'\.(com|org|net|edu|gov|mil)$', '', d2)
+    return calculate_similarity(d1, d2) > 0.8 and d1 != d2
+
 
 def calculate_similarity(s1: str, s2: str) -> float:
-    """Calculate string similarity"""
-    if len(s1) == 0 or len(s2) == 0:
-        return 0
-    
-    longer = s1 if len(s1) > len(s2) else s2
-    shorter = s2 if len(s1) > len(s2) else s1
-    
-    if len(longer) == 0:
+    longer, shorter = (s1, s2) if len(s1) >= len(s2) else (s2, s1)
+    if not longer:
         return 1.0
-    
-    edit_distance = levenshtein_distance(longer, shorter)
-    return (len(longer) - edit_distance) / len(longer)
+    return (len(longer) - levenshtein_distance(longer, shorter)) / len(longer)
+
 
 def levenshtein_distance(s1: str, s2: str) -> int:
-    """Calculate Levenshtein distance between two strings"""
-    if len(s1) < len(s2):
-        return levenshtein_distance(s2, s1)
-    
-    if len(s2) == 0:
-        return len(s1)
-    
-    previous_row = list(range(len(s2) + 1))
+    if len(s1) < len(s2): return levenshtein_distance(s2, s1)
+    if not s2: return len(s1)
+    prev_row = list(range(len(s2) + 1))
     for i, c1 in enumerate(s1):
-        current_row = [i + 1]
+        curr_row = [i + 1]
         for j, c2 in enumerate(s2):
-            insertions = previous_row[j + 1] + 1
-            deletions = current_row[j] + 1
-            substitutions = previous_row[j] + (c1 != c2)
-            current_row.append(min(insertions, deletions, substitutions))
-        previous_row = current_row
-    
-    return previous_row[-1]
+            insert, delete = prev_row[j + 1] + 1, curr_row[j] + 1
+            substitute = prev_row[j] + (c1 != c2)
+            curr_row.append(min(insert, delete, substitute))
+        prev_row = curr_row
+    return prev_row[-1]
+
+
+# === SSL Certificate Checker === #
 
 def check_ssl_certificate(url: str) -> Dict:
-    """Check SSL certificate validity"""
     try:
         parsed = urlparse(url)
-        hostname = parsed.hostname
-        port = parsed.port or 443
-        
+        hostname, port = parsed.hostname, parsed.port or 443
+
         if parsed.scheme != 'https':
-            return {
-                'valid': False,
-                'issues': ['Website does not use HTTPS'],
-                'score': 40
-            }
-        
+            return {'valid': False, 'issues': ['No HTTPS used'], 'score': 40}
+
         context = ssl.create_default_context()
         with socket.create_connection((hostname, port), timeout=10) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
                 cert = ssock.getpeercert()
-                
-                issues = []
-                score = 0
-                
                 not_after = datetime.datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
                 days_until_expiry = (not_after - datetime.datetime.now()).days
-                
+
+                score, issues = 0, []
                 if days_until_expiry < 30:
-                    issues.append('SSL certificate expires soon')
                     score += 20
-                
+                    issues.append("SSL expires soon")
+
                 subject = dict(x[0] for x in cert['subject'])
                 cert_domain = subject.get('commonName', '')
-                
                 if hostname not in cert_domain and not cert_domain.startswith('*.'):
-                    issues.append('SSL certificate domain mismatch')
                     score += 30
-                
+                    issues.append("SSL certificate domain mismatch")
+
+                issuer = dict(x[0] for x in cert['issuer']).get('organizationName', 'Unknown')
+
                 return {
                     'valid': True,
                     'issues': issues,
                     'score': score,
                     'expires': not_after.strftime('%Y-%m-%d'),
-                    'issuer': dict(x[0] for x in cert['issuer']).get('organizationName', 'Unknown')
+                    'issuer': issuer
                 }
-                
     except Exception as e:
-        return {
-            'valid': False,
-            'issues': [f'SSL check failed: {str(e)}'],
-            'score': 30
-        }
+        return {'valid': False, 'issues': [f'SSL check failed: {e}'], 'score': 30}
+
+
+# === Content Scraper & Analyzer === #
 
 def scrape_and_analyze_content(url: str) -> Dict:
-    """Scrape website content and analyze for scam indicators"""
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        
-        response = requests.get(url, headers=headers, timeout=15, allow_redirects=True)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        for script in soup(["script", "style", "noscript"]):
-            script.decompose()
-        
-        text_content = soup.get_text()
-        text_content = re.sub(r'\s+', ' ', text_content).strip()
-        
-        analysis = {
-            'scam_phrases': detect_scam_phrases(text_content),
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        for tag in soup(['script', 'style', 'noscript']):
+            tag.decompose()
+
+        text = re.sub(r'\s+', ' ', soup.get_text()).strip()
+
+        return {
+            'scam_phrases': detect_scam_phrases(text),
             'suspicious_elements': analyze_html_elements(soup),
-            'text_analysis': analyze_text_patterns(text_content),
-            'content_preview': text_content[:300] + "..." if len(text_content) > 300 else text_content
+            'text_analysis': analyze_text_patterns(text),
+            'content_preview': text[:300] + '...' if len(text) > 300 else text
         }
-        
-        return analysis
-        
+
     except Exception as e:
         return {
             'error': str(e),
@@ -273,207 +194,120 @@ def scrape_and_analyze_content(url: str) -> Dict:
             'content_preview': 'Could not load content'
         }
 
+
 def detect_scam_phrases(text: str) -> List[str]:
-    """Detect scam-related phrases in text"""
-    found_phrases = []
-    text_lower = text.lower()
-    
-    for phrase in scam_phrases:
-        if phrase.lower() in text_lower:
-            found_phrases.append(phrase)
-    
-    return found_phrases
+    return [phrase for phrase in SCAM_PHRASES if phrase.lower() in text.lower()]
+
 
 def analyze_html_elements(soup) -> List[str]:
-    """Analyze HTML elements for suspicious patterns"""
-    suspicious_elements = []
-    
-    hidden_forms = soup.find_all('form', style=re.compile(r'display:\s*none'))
-    if hidden_forms:
-        suspicious_elements.append("Hidden forms detected")
-    
-    iframes = soup.find_all('iframe')
-    for iframe in iframes:
-        src = iframe.get('src', '')
-        if src and any(domain in src for domain in suspicious_domains):
-            suspicious_elements.append("Suspicious iframe source")
-    
-    meta_refresh = soup.find('meta', attrs={'http-equiv': 'refresh'})
-    if meta_refresh:
-        suspicious_elements.append("Automatic redirect detected")
-    
-    external_links = soup.find_all('a', href=True)
-    for link in external_links:
-        href = link['href']
-        if href.startswith('http') and any(domain in href for domain in suspicious_domains):
-            suspicious_elements.append("Links to suspicious domains")
-    
-    return suspicious_elements
+    findings = []
+    if soup.find_all('form', style=re.compile(r'display:\s*none')):
+        findings.append("Hidden forms detected")
+    for iframe in soup.find_all('iframe'):
+        if any(domain in iframe.get('src', '') for domain in SUSPICIOUS_DOMAINS):
+            findings.append("Suspicious iframe source")
+    if soup.find('meta', attrs={'http-equiv': 'refresh'}):
+        findings.append("Auto-redirect detected")
+    for link in soup.find_all('a', href=True):
+        if any(domain in link['href'] for domain in SUSPICIOUS_DOMAINS):
+            findings.append("Links to suspicious domains")
+    return findings
+
 
 def analyze_text_patterns(text: str) -> Dict:
-    """Analyze text patterns for scam indicators"""
-    analysis = {}
-    
-    urgency_words = ['urgent', 'immediate', 'quickly', 'asap', 'now', 'today', 'expires']
-    urgency_count = sum(1 for word in urgency_words if word in text.lower())
-    analysis['urgency_score'] = min(urgency_count * 10, 50)
-    
-    money_terms = ['$', 'money', 'cash', 'prize', 'million', 'thousand', 'fee', 'payment']
-    money_count = sum(1 for term in money_terms if term in text.lower())
-    analysis['money_focus_score'] = min(money_count * 5, 30)
-    
-    spelling_errors = count_potential_spelling_errors(text)
-    analysis['grammar_score'] = min(spelling_errors * 3, 25)
-    
-    exclamation_count = text.count('!')
-    analysis['excitement_score'] = min(exclamation_count * 2, 20)
-    
-    return analysis
+    lower = text.lower()
+    urgency = sum(lower.count(word) for word in ['urgent', 'immediate', 'quickly', 'asap', 'now', 'today', 'expires'])
+    money = sum(lower.count(word) for word in ['$', 'money', 'cash', 'prize', 'million', 'fee'])
+    spelling_errors = count_spelling_errors(text)
+    exclamations = text.count('!')
 
-def count_potential_spelling_errors(text: str) -> int:
-    """Simple heuristic to count potential spelling errors"""
-    words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
-    
-    common_errors = [
-        'recieve', 'seperate', 'occured', 'goverment', 'beleive',
-        'neccessary', 'begining', 'existance', 'maintainance'
-    ]
-    
-    error_count = sum(1 for word in words if word in common_errors)
-    return error_count
-
-def calculate_overall_risk(url_analysis: Dict, ssl_analysis: Dict, content_analysis: Dict) -> Dict:
-    """Calculate overall risk assessment"""
-    total_score = 0
-    risk_factors = []
-    
-    total_score += url_analysis.get('score', 0)
-    risk_factors.extend(url_analysis.get('issues', []))
-    
-    total_score += ssl_analysis.get('score', 0)
-    risk_factors.extend(ssl_analysis.get('issues', []))
-    
-    if 'scam_phrases' in content_analysis:
-        phrase_score = len(content_analysis['scam_phrases']) * 15
-        total_score += phrase_score
-        if content_analysis['scam_phrases']:
-            risk_factors.append(f"Contains {len(content_analysis['scam_phrases'])} scam phrases")
-    
-    if 'suspicious_elements' in content_analysis:
-        element_score = len(content_analysis['suspicious_elements']) * 10
-        total_score += element_score
-        risk_factors.extend(content_analysis['suspicious_elements'])
-    
-    if 'text_analysis' in content_analysis:
-        text_scores = content_analysis['text_analysis']
-        for key, score in text_scores.items():
-            total_score += score
-            if score > 15:
-                risk_factors.append(f"High {key.replace('_', ' ')}")
-    
-    if total_score >= 80:
-        risk_level = 'VERY HIGH'
-        color = 'danger'
-    elif total_score >= 60:
-        risk_level = 'HIGH'
-        color = 'danger'
-    elif total_score >= 40:
-        risk_level = 'MEDIUM'
-        color = 'warning'
-    elif total_score >= 20:
-        risk_level = 'LOW'
-        color = 'info'
-    else:
-        risk_level = 'MINIMAL'
-        color = 'success'
-    
     return {
-        'score': min(total_score, 100),
-        'level': risk_level,
-        'color': color,
-        'factors': risk_factors[:10]
+        'urgency_score': min(urgency * 10, 50),
+        'money_focus_score': min(money * 5, 30),
+        'grammar_score': min(spelling_errors * 3, 25),
+        'excitement_score': min(exclamations * 2, 20)
     }
+
+
+def count_spelling_errors(text: str) -> int:
+    common_misspellings = ['recieve', 'seperate', 'occured', 'goverment', 'beleive',
+                           'neccessary', 'begining', 'existance', 'maintainance']
+    words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+    return sum(1 for word in words if word in common_misspellings)
+
+
+# === Risk Calculation === #
+
+def calculate_overall_risk(url_data: Dict, ssl_data: Dict, content_data: Dict) -> Dict:
+    score = url_data.get('score', 0) + ssl_data.get('score', 0)
+    factors = url_data.get('issues', []) + ssl_data.get('issues', [])
+
+    phrases = content_data.get('scam_phrases', [])
+    score += len(phrases) * 15
+    if phrases:
+        factors.append(f"Found {len(phrases)} scam phrases")
+
+    elements = content_data.get('suspicious_elements', [])
+    score += len(elements) * 10
+    factors.extend(elements)
+
+    text_scores = content_data.get('text_analysis', {})
+    for key, val in text_scores.items():
+        score += val
+        if val > 15:
+            factors.append(f"High {key.replace('_', ' ')}")
+
+    if score >= 80:
+        level, color = 'VERY HIGH', 'danger'
+    elif score >= 60:
+        level, color = 'HIGH', 'danger'
+    elif score >= 40:
+        level, color = 'MEDIUM', 'warning'
+    elif score >= 20:
+        level, color = 'LOW', 'info'
+    else:
+        level, color = 'MINIMAL', 'success'
+
+    return {
+        'score': min(score, 100),
+        'level': level,
+        'color': color,
+        'factors': factors[:10]
+    }
+
+
+# === Entry Point === #
 
 def comprehensive_scan(url: str) -> Dict:
-    """Perform comprehensive scam detection scan"""
-    results = {
-        'url': url,
-        'timestamp': datetime.datetime.now().isoformat(),
-        'analyses': {},
-        'risk_assessment': {}
-    }
-    
+    timestamp = datetime.datetime.now().isoformat()
     try:
-        results['analyses']['url_structure'] = check_url_structure(url)
-        results['analyses']['ssl_certificate'] = check_ssl_certificate(url)
-        results['analyses']['content'] = scrape_and_analyze_content(url)
-        
-        results['risk_assessment'] = calculate_overall_risk(
-            results['analyses']['url_structure'],
-            results['analyses']['ssl_certificate'],
-            results['analyses']['content']
-        )
-        
-        results['status'] = 'success'
-        
-    except Exception as e:
-        results['status'] = 'error'
-        results['error'] = str(e)
-        results['risk_assessment'] = {
-            'score': 50,
-            'level': 'UNKNOWN',
-            'color': 'secondary',
-            'factors': ['Analysis failed due to error']
+        url_analysis = check_url_structure(url)
+        ssl_analysis = check_ssl_certificate(url)
+        content_analysis = scrape_and_analyze_content(url)
+        risk = calculate_overall_risk(url_analysis, ssl_analysis, content_analysis)
+
+        return {
+            'url': url,
+            'timestamp': timestamp,
+            'analyses': {
+                'url_structure': url_analysis,
+                'ssl_certificate': ssl_analysis,
+                'content': content_analysis
+            },
+            'risk_assessment': risk,
+            'status': 'success'
         }
-    
-    return results
 
-
-
-
-
-def initialize_scam_data():
-    """Initialize the database with common scam types if they don't exist."""
-    if ScamType.query.count() == 0:
-        scam_types = [
-            {
-                'name': 'Phishing Email',
-                'description': 'Fraudulent emails designed to steal personal information by impersonating legitimate organizations.',
-                'warning_signs': 'Urgent language, suspicious sender addresses, requests for personal information, poor grammar/spelling, generic greetings',
-                'example': 'Email claiming your account will be closed unless you click a link and verify your credentials.',
-                'prevention_tips': 'Always verify sender authenticity, check URLs carefully, never provide sensitive information via email, use official websites directly'
-            },
-            {
-                'name': 'Tech Support Scam',
-                'description': 'Scammers pose as technical support to gain remote access to computers or steal money.',
-                'warning_signs': 'Unsolicited calls about computer problems, requests for remote access, pressure to act immediately, requests for payment',
-                'example': 'Cold call claiming your computer is infected and needs immediate fixing for a fee.',
-                'prevention_tips': 'Never give remote access to unsolicited callers, legitimate companies don\'t make unsolicited support calls, verify identity independently'
-            },
-            {
-                'name': 'Romance Scam',
-                'description': 'Criminals create fake romantic relationships online to manipulate victims into sending money.',
-                'warning_signs': 'Professes love quickly, avoids meeting in person, has emergencies requiring money, limited photos, stories don\'t add up',
-                'example': 'Online romantic interest who needs money for a family emergency or travel expenses to meet you.',
-                'prevention_tips': 'Be cautious of online relationships, never send money to someone you haven\'t met, verify their identity, meet in person before committing'
-            },
-            {
-                'name': 'Investment/Cryptocurrency Scam',
-                'description': 'Fraudulent investment opportunities promising unrealistic returns, often involving cryptocurrency.',
-                'warning_signs': 'Guaranteed high returns, pressure to invest quickly, unlicensed sellers, complex fee structures, celebrity endorsements',
-                'example': 'Social media ad promising to double your cryptocurrency investment in 30 days.',
-                'prevention_tips': 'Research investments thoroughly, verify licenses, be skeptical of guaranteed returns, consult financial advisors'
-            },
-            {
-                'name': 'Online Shopping Scam',
-                'description': 'Fake online stores that take payment but never deliver goods, or sell counterfeit items.',
-                'warning_signs': 'Prices too good to be true, no contact information, poor website design, no customer reviews, payment only by wire transfer',
-                'example': 'Website selling designer goods at 90% discount with no return policy.',
-                'prevention_tips': 'Shop from reputable retailers, check reviews, use secure payment methods, verify contact information'
-            },
-            {
-                'name': 'Social Security/Government Scam',
-                'description': 'Scammers impersonate government agencies to steal personal information or money.',
-                'warning_signs': 'Threats of arrest, demands for immediate payment, requests for Social Security numbers, pressure tactics',
-                'example': 'Call claiming your Social Security number is suspended and threatening arrest unless you pay immediately.',
-                'prevention_tips': 'Government agencies don\'t threaten arrest over phone, verify caller identity, hang up and call official numbers directly'
+    except Exception as e:
+        return {
+            'url': url,
+            'timestamp': timestamp,
+            'status': 'error',
+            'error': str(e),
+            'risk_assessment': {
+                'score': 50,
+                'level': 'UNKNOWN',
+                'color': 'secondary',
+                'factors': ['Analysis failed due to error']
+            }
+        }
