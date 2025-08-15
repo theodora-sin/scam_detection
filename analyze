@@ -1,0 +1,23 @@
+
+function analyze(){
+    text("Submit supicious URLs, emails or messages for scam detection analysis");
+    text("Our system will analyze the content and provide a risk assessment");
+    // Auto-resize textarea based on content type
+    document.querySelectorAll('input[name="content_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const textarea = document.getElementById('content');
+        const contentType = this.value;
+        
+        if (contentType === 'url') {
+            textarea.rows = 3;
+            textarea.placeholder = 'Enter the suspicious URL here...\nExample: https://suspicious-website.com/verify-account';
+        } else if (contentType === 'email') {
+            textarea.rows = 10;
+            textarea.placeholder = 'Paste the full email content here, including headers if available...\nInclude: sender, subject, and message body';
+        } else if (contentType === 'message') {
+            textarea.rows = 6;
+            textarea.placeholder = 'Paste the suspicious message or text here...\nCan be from SMS, social media, chat apps, etc.';
+        }
+    });
+});    
+}
