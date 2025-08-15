@@ -1,5 +1,3 @@
-// === Scam Detection Frontend (p5.js + JavaScript) === //
-
 let inputBox, submitButton, returnButton;
 let suspicious_score = 0;
 let currentScreen = 'main';
