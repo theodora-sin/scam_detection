@@ -1,183 +1,105 @@
-let inputBox, submitButton, returnButton;
-let suspicious_score = 0; // Initialize the score variable
-let currentScreen = 'main'; // Track current screen
+// === Scam Detection Frontend (p5.js + JavaScript) === //
 
-// p5.js setup function
+let inputBox, submitButton, returnButton;
+let suspicious_score = 0;
+let currentScreen = 'main';
+
+// === Setup & Draw === //
 function setup() {
     createCanvas(800, 600);
 }
 
-// p5.js draw function - runs continuously
 function draw() {
-    if (currentScreen === 'main') {
-        mainscreen();
-    } else if (currentScreen === 'extreme') {
-        extremerisk();
-    } else if (currentScreen === 'high') {
-        highrisk();
-    } else if (currentScreen === 'medium') {
-        mediumrisk();
-    } else if (currentScreen === 'low') {
-        lowrisk();
-    } else if (currentScreen === 'minimal') {
-        minimalrisk();
-    } else if (currentScreen === 'unknown') {
-        unknownrisk();
+    clear();
+    switch (currentScreen) {
+        case 'main': mainscreen(); break;
+        case 'extreme': extremerisk(); break;
+        case 'high': highrisk(); break;
+        case 'medium': mediumrisk(); break;
+        case 'low': lowrisk(); break;
+        case 'minimal': minimalrisk(); break;
+        case 'unknown': unknownrisk(); break;
     }
 }
 
+// === Main Screen === //
 function mainscreen() {
-    // Set gradient background for main screen
     setGradientBackground(color(100, 150, 255), color(50, 100, 200));
-    
+
     fill(255);
     textAlign(CENTER);
     textSize(26);
-    textFont('Arial');
-    text("Welcome to Scam Detection Website", width/2, 50);
-    
+    text("Welcome to Scam Detection Website", width / 2, 50);
     textSize(20);
-    text("Please enter a website", width/2, 150);
+    text("Please enter a suspicious website URL", width / 2, 150);
 
-    // Input field for the website
     if (!inputBox) {
         inputBox = createInput();
-        inputBox.position(width/2 - 150, 200);
+        inputBox.position(width / 2 - 150, 200);
         inputBox.size(300, 30);
-        inputBox.attribute('placeholder', 'Enter the website link here...');
+        inputBox.attribute('placeholder', 'e.g. https://phishy-site.com');
     }
-    
-    // Submit button
+
     if (!submitButton) {
         submitButton = createButton('Submit');
-        submitButton.position(width/2 - 50, 250);
+        submitButton.position(width / 2 - 50, 250);
         submitButton.size(100, 30);
-        submitButton.style('background-color', 'blue');
-        submitButton.style('color', 'white');
-        submitButton.style('border', 'none');
-        submitButton.style('border-radius', '5px');
-        
-        // Add click event
+        styleButton(submitButton);
         submitButton.mousePressed(analyzeWebsite);
     }
 }
 
+// === Risk Screens === //
+function extremerisk()     { displayRisk("EXTREME RISK", suspicious_score, color(250, 9, 9), color(236, 107, 92)); }
+function highrisk()        { displayRisk("HIGH RISK", suspicious_score, color(220, 53, 69), color(231, 76, 60)); }
+function mediumrisk()      { displayRisk("MEDIUM RISK", suspicious_score, color(253, 126, 20), color(243, 156, 18)); }
+function lowrisk()         { displayRisk("LOW RISK", suspicious_score, color(255, 193, 7), color(241, 196, 15), true); }
+function minimalrisk()     { displayRisk("MINIMAL RISK", suspicious_score, color(25, 135, 84), color(39, 174, 96)); }
+function unknownrisk()     { displayRisk("RISK UNKNOWN", '', color(108, 117, 125), color(149, 165, 166)); }
+
+// === Analyze Submission === //
 function analyzeWebsite() {
     let url = inputBox.value();
-    if (url) {
-        // Here you would call your Flask backend
-        // For now, let's simulate a score for testing
-        suspicious_score = Math.floor(Math.random() * 100);
-        
-        // Clean up main screen elements
-        if (inputBox) {
-            inputBox.remove();
-            inputBox = null;
-        }
-        if (submitButton) {
-            submitButton.remove();
-            submitButton = null;
-        }
-        
-        // Determine which screen to show based on score
-        if (suspicious_score >= 80) {
-            currentScreen = 'extreme';
-        } else if (suspicious_score >= 60) {
-            currentScreen = 'high';
-        } else if (suspicious_score >= 40) {
-            currentScreen = 'medium';
-        } else if (suspicious_score >= 20) {
-            currentScreen = 'low';
-        } else if (suspicious_score >= 0) {
-            currentScreen = 'minimal';
-        } else {
-            currentScreen = 'unknown';
-        }
+    if (!url) return;
+
+    // Clean up elements
+    if (inputBox) { inputBox.remove(); inputBox = null; }
+    if (submitButton) { submitButton.remove(); submitButton = null; }
+
+    // Simulate score - replace this with AJAX call to Flask API
+    suspicious_score = Math.floor(Math.random() * 100);
+
+    if (suspicious_score >= 80) currentScreen = 'extreme';
+    else if (suspicious_score >= 60) currentScreen = 'high';
+    else if (suspicious_score >= 40) currentScreen = 'medium';
+    else if (suspicious_score >= 20) currentScreen = 'low';
+    else if (suspicious_score >= 0) currentScreen = 'minimal';
+    else currentScreen = 'unknown';
+}
+
+// === Display Result Screens === //
+function displayRisk(title, score, c1, c2, darkText = false) {
+    setGradientBackground(c1, c2);
+
+    fill(darkText ? 0 : 255);
+    textAlign(CENTER);
+    textSize(30);
+
+    if (score !== '') {
+        text(`Total Score: ${score}`, width / 2, height / 2 - 200);
     }
-}
 
-function extremerisk() {
-    setGradientBackground(color(250, 9, 9), color(236, 107, 92));
-    
-    fill(255);
-    textAlign(CENTER);
-    textSize(30);
-    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
-    text("EXTREME RISK", width/2, height/2 - 100);
-    
+    text(title, width / 2, height / 2 - 100);
     createReturnButton();
 }
 
-function highrisk() {
-    setGradientBackground(color(220, 53, 69), color(231, 76, 60));
-    
-    fill(255);
-    textAlign(CENTER);
-    textSize(30);
-    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
-    text("HIGH RISK", width/2, height/2 - 100);
-    
-    createReturnButton();
-}
-
-function mediumrisk() {
-    setGradientBackground(color(253, 126, 20), color(243, 156, 18));
-    
-    fill(255);
-    textAlign(CENTER);
-    textSize(30);
-    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
-    text("MEDIUM RISK", width/2, height/2 - 100);
-    
-    createReturnButton();
-}
-
-function lowrisk() {
-    setGradientBackground(color(255, 193, 7), color(241, 196, 15));
-    
-    fill(0); // Black text for better contrast on yellow
-    textAlign(CENTER);
-    textSize(30);
-    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
-    text("LOW RISK", width/2, height/2 - 100);
-    
-    createReturnButton();
-}
-
-function minimalrisk() {
-    setGradientBackground(color(25, 135, 84), color(39, 174, 96));
-    
-    fill(255);
-    textAlign(CENTER);
-    textSize(30);
-    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
-    text("MINIMAL RISK", width/2, height/2 - 100);
-    
-    createReturnButton();
-}
-
-function unknownrisk() {
-    setGradientBackground(color(108, 117, 125), color(149, 165, 166));
-    
-    fill(255);
-    textAlign(CENTER);
-    textSize(30);
-    text("RISK UNKNOWN", width/2, height/2 - 100);
-    
-    createReturnButton();
-}
-
+// === Return Button === //
 function createReturnButton() {
     if (!returnButton) {
         returnButton = createButton('Return to Main');
-        returnButton.position(width/2 - 75, height/2 + 50);
+        returnButton.position(width / 2 - 75, height / 2 + 50);
         returnButton.size(150, 40);
-        returnButton.style('background-color', '#007bff');
-        returnButton.style('color', 'white');
-        returnButton.style('border', 'none');
-        returnButton.style('border-radius', '5px');
-        returnButton.style('font-size', '16px');
-        
+        styleButton(returnButton);
         returnButton.mousePressed(returnToMain);
     }
 }
@@ -191,7 +113,7 @@ function returnToMain() {
     suspicious_score = 0;
 }
 
-// Helper function to create gradient backgrounds
+// === Helpers === //
 function setGradientBackground(c1, c2) {
     for (let i = 0; i <= height; i++) {
         let inter = map(i, 0, height, 0, 1);
@@ -199,4 +121,12 @@ function setGradientBackground(c1, c2) {
         stroke(c);
         line(0, i, width, i);
     }
+}
+
+function styleButton(btn) {
+    btn.style('background-color', '#007bff');
+    btn.style('color', 'white');
+    btn.style('border', 'none');
+    btn.style('border-radius', '5px');
+    btn.style('font-size', '16px');
 }
