@@ -1,261 +1,257 @@
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
-import requests
-import base64
-import re
-import nltk
-from bs4 import BeautifulSoup
+import os
+import hashlib
 from urllib.parse import urlparse
+from Scam_phrase import comprehensive_scan 
+
+# Import the VirusTotal function from your separate file
+from scanningurl import check_url_virustotal
+
+# Import your scam detection functions (if you have them)
+try:
+    from app import (
+        detect_scam_phrases, 
+        check_url_structure, 
+        check_ssl_certificate,
+        scrape_and_analyze_content
+    )
+    SCAM_DETECTION_AVAILABLE = True
+except ImportError:
+    SCAM_DETECTION_AVAILABLE = False
+    print(" Scam detection module not found - using VirusTotal only")
+
+# Initialize Flask app
 app = Flask(__name__)
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'your_default_secret_key_for_scam_detector')
+    DATABASE_URI = 'sqlite:///users.db'
+    DEBUG = True
+
+app.config.from_object(Config)
 socketio = SocketIO(app, cors_allowed_origins="*")
-# Enhanced scam phrases (use the expanded list above)
-scam_phrases = [
-    "urgent action required",
-    "claim your prize",
-    "congratulations! you have won",
-    "confirm your personal information",
-    "limited time offer",
-    "hsbc",
-    "click to unlock",
-    "verify your account",
-    "account suspended",
-    "wire transfer",
-    "lottery winner",
-    "inheritance money",
-    "tax refund",
-    "microsoft support",
-    "paypal security",
-    "download now",
-    "install software",
-    "confidential matter"
-]
-def check_url_virustotal(url):
-    """Check URL using VirusTotal API"""
-    api_key = ""  # Replace with your actual API key
+
+def comprehensive_analysis(url):
+    """Combine VirusTotal with other analysis methods"""
+    results = {
+        'url': url,
+        'timestamp': datetime.datetime.now().isoformat() if 'datetime' in globals() else 'unknown',
+        'analyses': {},
+        'risk_assessment': {}
+    }
     
-    if not api_key:
-        return {'status': 'error', 'details': 'VirusTotal API key not configured'}
+    # VirusTotal analysis (from your separate file)
+    print(f"🦠 Running VirusTotal scan for: {url}")
+    virustotal_result = check_url_virustotal(url)
+    results['analyses']['virustotal'] = virustotal_result
     
-    try:
-        # Base64 encode the URL
-        encoded_url = base64.urlsafe_b64encode(url.encode()).decode().strip("=")
-        
-        headers = {'x-apikey': api_key}
-        
-        # Make API request to VirusTotal
-        response = requests.get(f'https://www.virustotal.com/api/v3/urls/{encoded_url}', headers=headers)
-        
-        if response.status_code == 200:
-            result = response.json()
-            
-            if 'data' in result:
-                analysis_stats = result['data']['attributes']['last_analysis_stats']
-                
-                if analysis_stats['malicious'] > 0:
-                    return {'status': 'dangerous', 'details': analysis_stats}
-                else:
-                    return {'status': 'safe', 'details': analysis_stats}
-            else:
-                return {'status': 'unknown', 'details': 'No analysis data available'}
-        else:
-            return {'status': 'error', 'details': f'API request failed: {response.status_code}'}
-            
-    except Exception as e:
-        return {'status': 'error', 'details': str(e)}
-def check_url_google_safe_browsing(url):
-    """Check URL using Google Safe Browsing API"""
-    api_key = ""  # Replace with your Google API key
+    # Additional analyses (if available)
+    if SCAM_DETECTION_AVAILABLE:
+        print("🔍 Running additional scam detection...")
+        try:
+            results['analyses']['url_structure'] = check_url_structure(url)
+            results['analyses']['ssl_certificate'] = check_ssl_certificate(url)
+            results['analyses']['content'] = scrape_and_analyze_content(url)
+        except Exception as e:
+            print("Additional analysis failed: {str(e)}")
     
-    if not api_key:
-        return {'status': 'error', 'details': 'Google Safe Browsing API key not configured'}
-    
-    try:
-        api_url = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={api_key}"
-        
-        payload = {
-            "client": {"clientId": "scam-detector", "clientVersion": "1.0"},
-            "threatInfo": {
-                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
-                "platformTypes": ["ANY_PLATFORM"],
-                "threatEntryTypes": ["URL"],
-                "threatEntries": [{"url": url}]
-            }
-        }
-        headers = {"Content-Type": "application/json"}
-        
-        response = requests.post(api_url, json=payload, headers=headers)
-        result = response.json()
-        if "matches" in result:
-            return {"status": "dangerous", "details": result["matches"]}
-        else:
-            return {"status": "safe", "details": None}
-            
-    except Exception as e:
-        return {"status": "error", "details": str(e)}
-def scrape_website_content(url):
-    """Scrape website content for analysis"""
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        
-        response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Remove script and style elements
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        # Get text content
-        text = soup.get_text()
-        
-        # Clean up whitespace
-        lines = (line.strip() for line in text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        text = ' '.join(chunk for chunk in chunks if chunk)
-        
-        return text[:5000]  # Limit to first 5000 characters
-        
-    except Exception as e:
-        return f"Error scraping content: {str(e)}"
-def detect_scam_phrases(text):
-    """Detect scam-related phrases in the given text"""
-    found_phrases = []
-    for phrase in scam_phrases:
-        if re.search(r"\b" + re.escape(phrase) + r"\b", text, re.IGNORECASE):
-            found_phrases.append(phrase)
-    return found_phrases
-def calculate_risk_score(virustotal_result, google_result, scam_phrases_found):
-    """Calculate overall risk score"""
-    risk_score = 0
+    # Calculate overall risk assessment
+    total_score = 0
     risk_factors = []
     
-    # VirusTotal analysis
-    if virustotal_result['status'] == 'dangerous':
-        risk_score += 50
-        risk_factors.append("Flagged by VirusTotal")
-    elif virustotal_result['status'] == 'safe':
-        risk_score -= 10
+    # VirusTotal contribution (highest weight)
+    vt_score = virustotal_result.get('score', 0)
+    total_score += vt_score
     
-    # Google Safe Browsing analysis
-    if google_result['status'] == 'dangerous':
-        risk_score += 40
-        risk_factors.append("Flagged by Google Safe Browsing")
-    elif google_result['status'] == 'safe':
-        risk_score -= 5
+    if virustotal_result.get('status') == 'dangerous':
+        risk_factors.append(" Flagged as malicious by {virustotal_result.get('malicious_engines', 0)} security engines")
+    elif virustotal_result.get('status') == 'suspicious':
+        risk_factors.append(" Flagged as suspicious by {virustotal_result.get('suspicious_engines', 0)} security engines")
+    elif virustotal_result.get('status') == 'safe':
+        risk_factors.append(" Verified as safe by {virustotal_result.get('clean_engines', 0)} security engines")
     
-    # Scam phrases
-    phrase_score = len(scam_phrases_found) * 8
-    risk_score += phrase_score
+    # Add other risk factors if available
+    if SCAM_DETECTION_AVAILABLE and 'url_structure' in results['analyses']:
+        url_score = results['analyses']['url_structure'].get('score', 0)
+        total_score += url_score
+        if url_score > 20:
+            risk_factors.extend(results['analyses']['url_structure'].get('issues', []))
     
-    if scam_phrases_found:
-        risk_factors.append(f"Contains {len(scam_phrases_found)} suspicious phrases")
-    
-    # Determine risk level
-    if risk_score >= 50:
+    # Determine final risk level
+    if total_score >= 70:
+        risk_level = 'VERY HIGH'
+        color = 'danger'
+    elif total_score >= 50:
         risk_level = 'HIGH'
-    elif risk_score >= 25:
+        color = 'danger'
+    elif total_score >= 30:
         risk_level = 'MEDIUM'
-    elif risk_score >= 10:
+        color = 'warning'
+    elif total_score >= 10:
         risk_level = 'LOW'
+        color = 'info'
     else:
         risk_level = 'MINIMAL'
+        color = 'success'
     
-    return {
-        'score': max(0, min(100, risk_score)),
+    results['risk_assessment'] = {
+        'score': min(int(total_score), 100),
         'level': risk_level,
-        'factors': risk_factors
+        'color': color,
+        'factors': risk_factors[:10],
+        'primary_engine': 'VirusTotal'
     }
+    
+    results['status'] = 'success'
+    return results
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 @app.route('/scan_url', methods=['POST'])
 def scan_url():
-    """Comprehensive URL scanning endpoint"""
-    data = request.json
-    url = data.get('url')
-    
-    if not url:
-        return jsonify({"status": "error", "message": "No URL provided"}), 400
-    
-    # Validate URL format
+    """Main scanning endpoint using your VirusTotal integration"""
     try:
-        parsed = urlparse(url)
-        if not parsed.scheme or not parsed.netloc:
+        data = request.json
+        url = data.get('url', '').strip()
+        
+        if not url:
+            return jsonify({"status": "error", "message": "No URL provided"}), 400
+        
+        # Add protocol if missing
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        
+        # Validate URL format
+        try:
+            parsed = urlparse(url)
+            if not parsed.netloc:
+                return jsonify({"status": "error", "message": "Invalid URL format"}), 400
+        except:
             return jsonify({"status": "error", "message": "Invalid URL format"}), 400
-    except:
-        return jsonify({"status": "error", "message": "Invalid URL format"}), 400
-    
+        
+        # Perform comprehensive analysis (VirusTotal + others)
+        results = comprehensive_analysis(url)
+        
+        return jsonify(results)
+        
+    except Exception as e:
+        return jsonify({
+            "status": "error", 
+            "message": str(e),
+            "risk_assessment": {
+                "score": 50,
+                "level": "UNKNOWN",
+                "color": "secondary",
+                "factors": ["Analysis failed due to technical error"]
+            }
+        }), 500
+
+@app.route('/virustotal_only', methods=['POST'])
+def virustotal_only():
+    """Endpoint for VirusTotal-only scanning"""
     try:
-        # Run all checks
-        virustotal_result = check_url_virustotal(url)
-        google_result = check_url_google_safe_browsing(url)
+        data = request.json
+        url = data.get('url', '').strip()
         
-        # Scrape website content
-        website_content = scrape_website_content(url)
+        if not url:
+            return jsonify({"status": "error", "message": "No URL provided"}), 400
         
-        # Detect scam phrases
-        scam_phrases_found = detect_scam_phrases(website_content)
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
         
-        # Calculate overall risk
-        risk_assessment = calculate_risk_score(virustotal_result, google_result, scam_phrases_found)
+        # Use your VirusTotal function directly
+        result = check_url_virustotal(url)
+        result['url'] = url
         
-        # Prepare response
-        response = {
-            "status": "success",
-            "url": url,
-            "analysis": {
-                "virustotal": virustotal_result,
-                "google_safe_browsing": google_result,
-                "scam_phrases": scam_phrases_found,
-                "content_preview": website_content[:200] + "..." if len(website_content) > 200 else website_content
-            },
-            "risk_assessment": risk_assessment
-        }
-        
-        return jsonify(response)
+        return jsonify(result)
         
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-# WebSocket events for real-time updates
+
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.json
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return jsonify({'status': 'error', 'message': 'Username and password required'}), 400
+        
+        if len(password) < 6:
+            return jsonify({'status': 'error', 'message': 'Password must be at least 6 characters'}), 400
+        
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        
+        return jsonify({'status': 'success', 'message': f'User {username} registered successfully!'})
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Registration failed: {str(e)}'}), 500
+
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.json
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return jsonify({'status': 'error', 'message': 'Username and password required'}), 400
+        
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        
+        return jsonify({'status': 'success', 'message': f'Welcome back, {username}!'})
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Login failed: {str(e)}'}), 500
+
+@socketio.on('connect')
+def handle_connect():
+    print('User connected to main scam detection service')
+    emit('alert', {
+        'message': 'Connected to advanced scam detection with VirusTotal integration',
+        'type': 'success'
+    })
+
 @socketio.on('scan_request')
 def handle_scan_request(data):
-    url = data['url']
+    """Real-time scanning using your VirusTotal integration"""
+    try:
+        url = data.get('url', '').strip()
+        
+        if not url:
+            emit('scan_error', {'message': 'No URL provided'})
+            return
+        
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        
+        # Emit progress updates
+        emit('scan_progress', {'stage': 'Starting comprehensive analysis...', 'progress': 10})
+        emit('scan_progress', {'stage': 'Querying VirusTotal database...', 'progress': 40})
+        
+        if SCAM_DETECTION_AVAILABLE:
+            emit('scan_progress', {'stage': 'Running additional security checks...', 'progress': 70})
+        
+        # Perform analysis using your VirusTotal function
+        results = comprehensive_analysis(url)
+        
+        emit('scan_progress', {'stage': 'Analysis complete!', 'progress': 100})
+        emit('scan_complete', results)
+        
+    except Exception as e:
+        emit('scan_error', {'message': f'Scan failed: {str(e)}'})
+
+if __name__ == '__main__':
+    print("🛡️  Starting Main Scam Detection Website...")
+    print("🦠 VirusTotal integration: ✅ Active")
+    print(f"🔍 Additional scam detection: {'✅ Active' if SCAM_DETECTION_AVAILABLE else '❌ Not available'}")
+    print("🌐 Server: http://localhost:5000")
     
-    # Emit progress updates
-    emit('scan_progress', {'stage': 'Starting scan...', 'progress': 10})
-    
-    # VirusTotal check
-    emit('scan_progress', {'stage': 'Checking VirusTotal...', 'progress': 30})
-    virustotal_result = check_url_virustotal(url)
-    
-    # Google Safe Browsing check
-    emit('scan_progress', {'stage': 'Checking Google Safe Browsing...', 'progress': 50})
-    google_result = check_url_google_safe_browsing(url)
-    
-    # Content analysis
-    emit('scan_progress', {'stage': 'Analyzing website content...', 'progress': 70})
-    website_content = scrape_website_content(url)
-    scam_phrases_found = detect_scam_phrases(website_content)
-    
-    # Final analysis
-    emit('scan_progress', {'stage': 'Calculating risk assessment...', 'progress': 90})
-    risk_assessment = calculate_risk_score(virustotal_result, google_result, scam_phrases_found)
-    
-    # Send final results
-    emit('scan_progress', {'stage': 'Complete!', 'progress': 100})
-    
-    response = {
-        "url": url,
-        "analysis": {
-            "virustotal": virustotal_result,
-            "google_safe_browsing": google_result,
-            "scam_phrases": scam_phrases_found
-        },
-        "risk_assessment": risk_assessment
-    }
+    socketio.run(app, debug=Config.DEBUG, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
     
     emit('scan_complete', response)
 if __name__ == '__main__':
