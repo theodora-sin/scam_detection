@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="eng"
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content ="width=device-width, inital-scale=1.0">
+    <title> Scam Detecting</title>
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+
+    <!--p5play-->
+    <!--L:atest p5.js-->
+    <script scr="https://cdnjs.cloudflare.com/ahax/libs/p5.js/1.8.0/p5.min.js"></script>
+    <script scr="https://cdnjs.cloudflare.com/ahax/libs/p5.js/1.8.0/addons/p5.sound.min,js"></script>
+    <!--updated to local files-->
+
+
+</head>
+
+<body>
+
+</body>
+
+</html>
