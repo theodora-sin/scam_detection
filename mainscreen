@@ -1,0 +1,202 @@
+let inputBox, submitButton, returnButton;
+let suspicious_score = 0; // Initialize the score variable
+let currentScreen = 'main'; // Track current screen
+
+// p5.js setup function
+function setup() {
+    createCanvas(800, 600);
+}
+
+// p5.js draw function - runs continuously
+function draw() {
+    if (currentScreen === 'main') {
+        mainscreen();
+    } else if (currentScreen === 'extreme') {
+        extremerisk();
+    } else if (currentScreen === 'high') {
+        highrisk();
+    } else if (currentScreen === 'medium') {
+        mediumrisk();
+    } else if (currentScreen === 'low') {
+        lowrisk();
+    } else if (currentScreen === 'minimal') {
+        minimalrisk();
+    } else if (currentScreen === 'unknown') {
+        unknownrisk();
+    }
+}
+
+function mainscreen() {
+    // Set gradient background for main screen
+    setGradientBackground(color(100, 150, 255), color(50, 100, 200));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(26);
+    textFont('Arial');
+    text("Welcome to Scam Detection Website", width/2, 50);
+    
+    textSize(20);
+    text("Please enter a website", width/2, 150);
+
+    // Input field for the website
+    if (!inputBox) {
+        inputBox = createInput();
+        inputBox.position(width/2 - 150, 200);
+        inputBox.size(300, 30);
+        inputBox.attribute('placeholder', 'Enter the website link here...');
+    }
+    
+    // Submit button
+    if (!submitButton) {
+        submitButton = createButton('Submit');
+        submitButton.position(width/2 - 50, 250);
+        submitButton.size(100, 30);
+        submitButton.style('background-color', 'blue');
+        submitButton.style('color', 'white');
+        submitButton.style('border', 'none');
+        submitButton.style('border-radius', '5px');
+        
+        // Add click event
+        submitButton.mousePressed(analyzeWebsite);
+    }
+}
+
+function analyzeWebsite() {
+    let url = inputBox.value();
+    if (url) {
+        // Here you would call your Flask backend
+        // For now, let's simulate a score for testing
+        suspicious_score = Math.floor(Math.random() * 100);
+        
+        // Clean up main screen elements
+        if (inputBox) {
+            inputBox.remove();
+            inputBox = null;
+        }
+        if (submitButton) {
+            submitButton.remove();
+            submitButton = null;
+        }
+        
+        // Determine which screen to show based on score
+        if (suspicious_score >= 80) {
+            currentScreen = 'extreme';
+        } else if (suspicious_score >= 60) {
+            currentScreen = 'high';
+        } else if (suspicious_score >= 40) {
+            currentScreen = 'medium';
+        } else if (suspicious_score >= 20) {
+            currentScreen = 'low';
+        } else if (suspicious_score >= 0) {
+            currentScreen = 'minimal';
+        } else {
+            currentScreen = 'unknown';
+        }
+    }
+}
+
+function extremerisk() {
+    setGradientBackground(color(250, 9, 9), color(236, 107, 92));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(30);
+    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
+    text("EXTREME RISK", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function highrisk() {
+    setGradientBackground(color(220, 53, 69), color(231, 76, 60));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(30);
+    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
+    text("HIGH RISK", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function mediumrisk() {
+    setGradientBackground(color(253, 126, 20), color(243, 156, 18));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(30);
+    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
+    text("MEDIUM RISK", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function lowrisk() {
+    setGradientBackground(color(255, 193, 7), color(241, 196, 15));
+    
+    fill(0); // Black text for better contrast on yellow
+    textAlign(CENTER);
+    textSize(30);
+    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
+    text("LOW RISK", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function minimalrisk() {
+    setGradientBackground(color(25, 135, 84), color(39, 174, 96));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(30);
+    text("Total Score: " + suspicious_score, width/2, height/2 - 200);
+    text("MINIMAL RISK", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function unknownrisk() {
+    setGradientBackground(color(108, 117, 125), color(149, 165, 166));
+    
+    fill(255);
+    textAlign(CENTER);
+    textSize(30);
+    text("RISK UNKNOWN", width/2, height/2 - 100);
+    
+    createReturnButton();
+}
+
+function createReturnButton() {
+    if (!returnButton) {
+        returnButton = createButton('Return to Main');
+        returnButton.position(width/2 - 75, height/2 + 50);
+        returnButton.size(150, 40);
+        returnButton.style('background-color', '#007bff');
+        returnButton.style('color', 'white');
+        returnButton.style('border', 'none');
+        returnButton.style('border-radius', '5px');
+        returnButton.style('font-size', '16px');
+        
+        returnButton.mousePressed(returnToMain);
+    }
+}
+
+function returnToMain() {
+    if (returnButton) {
+        returnButton.remove();
+        returnButton = null;
+    }
+    currentScreen = 'main';
+    suspicious_score = 0;
+}
+
+// Helper function to create gradient backgrounds
+function setGradientBackground(c1, c2) {
+    for (let i = 0; i <= height; i++) {
+        let inter = map(i, 0, height, 0, 1);
+        let c = lerpColor(c1, c2, inter);
+        stroke(c);
+        line(0, i, width, i);
+    }
+}
