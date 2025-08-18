@@ -1,31 +1,23 @@
 import os
 
 class Config:
-    """Base configuration class"""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'scam-detector-secret-key-2024'
-    DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///scam_detector.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-class DevelopmentConfig(Config):
-    """Development configuration"""
+    SECRET_KEY = os.environ.get("SECRET_KEY") or "scam-detector-secret-key-2024"
     DEBUG = True
-    TESTING = False
+
+class DevelopmentConfig(Config):
+    DEBUG = True
 
 class ProductionConfig(Config):
-    """Production configuration"""
     DEBUG = False
-    TESTING = False
-    SECRET_KEY = os.environ.get('SECRET_KEY')  # Must be set in production
-    
-class TestingConfig(Config):
-    """Testing configuration"""
-    TESTING = True
-    DATABASE_URI = 'sqlite:///test_scam_detector.db'
+    SECRET_KEY = os.environ.get("SECRET_KEY") or "set-a-strong-secret-in-prod"
 
-# Configuration dictionary
+class TestingConfig(Config):
+    DEBUG = False
+
 config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'testing': TestingConfig,
-    'default': DevelopmentConfig
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "testing": TestingConfig,
+    "default": DevelopmentConfig
 }
+
