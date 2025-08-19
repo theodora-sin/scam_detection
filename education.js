@@ -76,3 +76,4 @@ function showEducationScreen() {
   // tell sketch we are in education mode
   if (typeof currentScreen !== 'undefined') currentScreen = 'education';
 }
+
