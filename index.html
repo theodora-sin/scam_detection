@@ -1,132 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scam Detection Tool</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>🛡️ Scam Detection App</title>
   <style>
-    /* keep your inline styles to match your original look */
     body {
       font-family: Arial, sans-serif;
-      margin: 0; padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh; color: white;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
     }
-    .container { max-width:800px; margin:0 auto; text-align:center; padding:50px 20px; }
-    h1 { font-size:2.5em; margin-bottom:20px; }
-    .description { font-size:1.2em; margin-bottom:40px; }
-    .scan-form { background:rgba(255,255,255,0.1); padding:30px; border-radius:10px; margin-bottom:30px; }
-    .url-input { width:60%; padding:15px; font-size:16px; border:none; border-radius:5px; margin-right:10px; }
-    .scan-btn { padding:15px 30px; font-size:16px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; }
-    .scan-btn:hover { background:#218838; }
-    .results { background:rgba(255,255,255,0.1); padding:20px; border-radius:10px; margin-top:20px; display:none; text-align:left; }
-    .risk-high { background:rgba(220,53,69,0.3); }
-    .risk-medium { background:rgba(255,193,7,0.3); }
-    .risk-low { background:rgba(40,167,69,0.3); }
-    .edu-btn { margin-top:10px; background:#0d6efd; }
+    h1 { color: #333; }
+    #scanner {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    #results {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🛡️ Advanced Scam Detection</h1>
-    <p class="description">Enter a website URL to check its safety using our advanced scanning technology</p>
+  <h1>🛡️ Scam Detection</h1>
 
-    <div class="scan-form">
-      <input type="text" id="urlInput" class="url-input" placeholder="Enter website URL (e.g., example.com)">
-      <button id="scanBtn" class="scan-btn">Scan URL</button>
-      <button id="eduBtn" class="scan-btn edu-btn" type="button">Education</button>
-    </div>
-
-    <div id="results" class="results">
-      <h3 id="resultTitle">Scanning...</h3>
-      <p id="resultDetails"></p>
-      <div id="resultFactors"></div>
-      <pre id="contentPreview" style="white-space:pre-wrap; font-size: 12px;"></pre>
-    </div>
-
-    <div id="educationContainer" style="display:none; text-align:left;">
-      <h2>Scam Education and Prevention</h2>
-      <ul>
-        <li>Never share personal information via email or phone</li>
-        <li>Verify URLs before clicking suspicious links</li>
-        <li>Be skeptical of urgent or time-pressured requests</li>
-        <li>Be careful about replying to contact numbers or emails</li>
-        <li>Be cautious of unusual payment methods</li>
-        <li>Discuss suspicious messages with a trusted person</li>
-      </ul>
-      <button id="returnBtn" class="scan-btn" type="button">Return to App</button>
-    </div>
+  <div id="scanner">
+    <input type="text" id="urlInput" placeholder="Enter URL to scan..." />
+    <button onclick="scanUrl()">Scan URL</button>
   </div>
+
+  <div id="results"></div>
 
   <script>
     async function scanUrl() {
-      const urlInput = document.getElementById('urlInput');
-      const resultsDiv = document.getElementById('results');
-      const resultTitle = document.getElementById('resultTitle');
-      const resultDetails = document.getElementById('resultDetails');
-      const resultFactors = document.getElementById('resultFactors');
-      const contentPreview = document.getElementById('contentPreview');
+      const url = document.getElementById("urlInput").value;
+      if (!url) {
+        alert("Please enter a URL");
+        return;
+      }
 
-      const url = (urlInput.value || '').trim();
-      if (!url) { alert('Please enter a URL'); return; }
+      const response = await fetch("/scan_url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
 
-      resultsDiv.style.display = 'block';
-      resultsDiv.className = 'results';
-      resultTitle.textContent = 'Scanning...';
-      resultDetails.textContent = 'Please wait while we analyze the URL';
-      resultFactors.innerHTML = '';
-      contentPreview.textContent = '';
+      const data = await response.json();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.style.display = "block";
 
-      try {
-        const response = await fetch('/scan_url', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
-        const data = await response.json();
-
-        if (data.status === 'success') {
-          const risk = data.risk_assessment || {};
-          resultTitle.textContent = `Risk Level: ${risk.level} (Score: ${risk.score}/100)`;
-          resultDetails.textContent = `Analysis completed for: ${data.url}`;
-
-          if (risk.score >= 60) resultsDiv.className = 'results risk-high';
-          else if (risk.score >= 30) resultsDiv.className = 'results risk-medium';
-          else resultsDiv.className = 'results risk-low';
-
-          if (Array.isArray(risk.factors) && risk.factors.length) {
-            resultFactors.innerHTML = '<h4>Risk Factors:</h4><ul>' +
-              risk.factors.map(f => `<li>${f}</li>`).join('') + '</ul>';
-          }
-          const content = (data.analyses && data.analyses.content) ? data.analyses.content : {};
-          if (content.content_preview) {
-            contentPreview.textContent = "Content preview:\n" + content.content_preview;
-          }
-        } else {
-          resultTitle.textContent = 'Scan Failed';
-          resultDetails.textContent = data.message || 'Unknown error occurred';
-          resultsDiv.className = 'results risk-medium';
-        }
-      } catch (err) {
-        resultTitle.textContent = 'Connection Error';
-        resultDetails.textContent = 'Failed to connect to scanning service';
-        resultsDiv.className = 'results risk-high';
+      if (data.status === "ok") {
+        resultsDiv.innerHTML = `
+          <h3>Results for: ${data.url}</h3>
+          <p><b>Risk Level:</b> ${data.risk_assessment.level} 
+             (${data.risk_assessment.score}%)</p>
+          <ul>
+            ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join("")}
+          </ul>
+          <small>Analysis time: ${data.timestamp_backend}</small>
+        `;
+      } else {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.message}</p>`;
       }
     }
-
-    // UI hooks
-    document.getElementById('scanBtn').addEventListener('click', scanUrl);
-    document.getElementById('urlInput').addEventListener('keypress', e => { if (e.key === 'Enter') scanUrl(); });
-
-    // Education toggle
-    const eduBtn = document.getElementById('eduBtn');
-    const eduDiv = document.getElementById('educationContainer');
-    const resultsDiv = document.getElementById('results');
-    const returnBtn = document.getElementById('returnBtn');
-
-    eduBtn.addEventListener('click', () => { eduDiv.style.display = 'block'; resultsDiv.style.display = 'none'; });
-    returnBtn.addEventListener('click', () => { eduDiv.style.display = 'none'; });
   </script>
 </body>
 </html>
+
