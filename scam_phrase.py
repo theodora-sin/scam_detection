@@ -250,3 +250,4 @@ def comprehensive_scan(url: str) -> Dict:
                 'factors': [f'Analysis failed: {e}']
             }
         }
+
