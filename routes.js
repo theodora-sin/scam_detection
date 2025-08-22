@@ -1,9 +1,6 @@
-// REFINED VERSION of routes_1755839789513.js
-// Fixed: Better error handling, consistent return format, modular design
-
+// Scam Analyzer Core Engine
 class ScamAnalyzer {
     constructor() {
-        // Define scam patterns for different content types
         this.urlPatterns = [
             { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 20 },
             { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 30 },
@@ -35,7 +32,6 @@ class ScamAnalyzer {
             { pattern: /(whatsapp|telegram)\s*(chat|message|contact)/i, description: 'Suspicious communication platform', score: 20 }
         ];
         
-        // Legitimate indicators (reduce risk score)
         this.legitimatePatterns = [
             { pattern: /https:\/\/.*\.gov\//i, description: 'Government website', score: -20 },
             { pattern: /https:\/\/.*\.(edu|org)\//i, description: 'Educational/non-profit domain', score: -10 },
@@ -44,7 +40,6 @@ class ScamAnalyzer {
         ];
     }
 
-    // FIXED: Main analysis method with consistent interface
     analyzeContent(content, contentType) {
         try {
             if (!content || !contentType) {
@@ -63,30 +58,22 @@ class ScamAnalyzer {
             }
         } catch (error) {
             console.error('Analysis error:', error);
-            return this._createErrorResult(error.message);
+            return {
+                level: 'unknown',
+                score: 0,
+                factors: [],
+                details: `Error during analysis: ${error.message}`,
+                timestamp: new Date().toISOString()
+            };
         }
     }
 
-    // FIXED: Consistent error result format
-    _createErrorResult(message) {
-        return {
-            level: 'unknown',
-            score: 0,
-            factors: [],
-            details: `Error during analysis: ${message}`,
-            timestamp: new Date().toISOString()
-        };
-    }
-
-    // FIXED: Better URL validation and consistent return format
     _analyzeUrl(url) {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        // Validate URL format
         try {
             const urlObj = new URL(url);
-            // Additional URL validation
             if (!urlObj.protocol.startsWith('http')) {
                 throw new Error('Invalid protocol');
             }
@@ -100,50 +87,38 @@ class ScamAnalyzer {
             };
         }
         
-        // Check URL patterns
         riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-        
-        // Check for legitimate patterns
         riskScore += this._checkPatterns(url, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
 
-    // FIXED: Email analysis with better pattern matching
     _analyzeEmail(emailContent) {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        // Check email patterns
         riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-        
-        // Check for legitimate patterns
         riskScore += this._checkPatterns(emailContent, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
     }
 
-    // FIXED: Message analysis
     _analyzeMessage(message) {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        // Check message patterns
         riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-        
-        // Check for legitimate patterns
         riskScore += this._checkPatterns(message, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, message, 'Message');
     }
 
-    // ADDED: Helper method to check patterns (DRY principle)
     _checkPatterns(content, patterns, detectedPatterns) {
         let score = 0;
         for (const { pattern, description, score: patternScore } of patterns) {
             if (pattern.test(content)) {
                 score += patternScore;
-                if (patternScore > 0) { // Only add positive scores to detected patterns
+                if (patternScore > 0) {
                     detectedPatterns.push(description);
                 }
             }
@@ -151,7 +126,6 @@ class ScamAnalyzer {
         return score;
     }
 
-    // ADDED: Consistent result formatting
     _formatResult(riskScore, detectedPatterns, content, contentType) {
         const finalScore = Math.max(0, riskScore);
         const level = this._calculateRiskLevel(finalScore);
@@ -165,14 +139,12 @@ class ScamAnalyzer {
         };
     }
 
-    // FIXED: Better risk level calculation
     _calculateRiskLevel(riskScore) {
         if (riskScore >= 60) return 'high';
         if (riskScore >= 30) return 'medium';
         return 'low';
     }
 
-    // ADDED: Better analysis details generation
     _generateAnalysisDetails(contentType, content, riskScore, patterns) {
         let details = `${contentType} Analysis Summary:\n\n`;
         details += `Risk Score: ${riskScore}/100\n`;
@@ -198,9 +170,58 @@ class ScamAnalyzer {
     }
 }
 
-// Export for use in both browser and Node.js
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ScamAnalyzer;
-} else if (typeof window !== 'undefined') {
-    window.ScamAnalyzer = ScamAnalyzer;
+// Analysis History Storage
+class AnalysisHistory {
+    constructor() {
+        this.storageKey = 'scamguard_analysis_history';
+        this.maxEntries = 50;
+    }
+
+    addAnalysis(contentType, content, result) {
+        try {
+            const history = this.getHistory();
+            const analysis = {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                content_type: contentType,
+                content: content.length > 100 ? content.slice(0, 100) + '...' : content,
+                risk_level: result.level || 'unknown',
+                risk_score: result.score || 0,
+                detected_patterns: result.factors || [],
+                analysis_details: result.details || 'No details available',
+                created_at: new Date().toISOString()
+            };
+
+            history.unshift(analysis);
+            
+            if (history.length > this.maxEntries) {
+                history.splice(this.maxEntries);
+            }
+            
+            localStorage.setItem(this.storageKey, JSON.stringify(history));
+            return analysis;
+        } catch (error) {
+            console.error('Error adding analysis to history:', error);
+            return null;
+        }
+    }
+
+    getHistory() {
+        try {
+            const stored = localStorage.getItem(this.storageKey);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error loading analysis history:', error);
+            return [];
+        }
+    }
+
+    clearHistory() {
+        try {
+            localStorage.removeItem(this.storageKey);
+            return true;
+        } catch (error) {
+            console.error('Error clearing history:', error);
+            return false;
+        }
+    }
 }
