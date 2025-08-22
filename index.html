@@ -1,73 +1,907 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🛡️ Scam Detection App</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
-    h1 { color: #333; }
-    #scanner { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    input[type="text"] { width: 70%; padding: 10px; font-size: 16px; }
-    button { padding: 10px 15px; font-size: 16px; background: #007BFF; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    #results { background: #fff; padding: 20px; border-radius: 8px; display: none; }
-    ul { padding-left: 20px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Advanced Scam Detection System</title>
+    
+    <!-- REFINED VERSION: Complete HTML structure for your backend_1755839789514.js -->
+    <!-- FIXED: All the missing elements your JavaScript expects -->
+    
+    <style>
+        /* Modern CSS with better organization */
+        :root {
+            --primary-color: #007BFF;
+            --primary-hover: #0056b3;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark-text);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Page sections */
+        .page-section {
+            display: none;
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark-text);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            margin: 0;
+            color: var(--dark-text);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Radio buttons for content type */
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            background: var(--light-bg);
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Results display */
+        .results-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .risk-assessment {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .risk-high {
+            background: #f8d7da;
+            border-color: var(--danger-color);
+            color: #721c24;
+        }
+
+        .risk-medium {
+            background: #fff3cd;
+            border-color: var(--warning-color);
+            color: #856404;
+        }
+
+        .risk-low {
+            background: #d4edda;
+            border-color: var(--success-color);
+            color: #155724;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            padding-left: 3rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* Loading states */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        /* Education content styles */
+        .tip-card {
+            background: #e8f5e8;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-card {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Analysis history */
+        .history-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .history-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+    </style>
 </head>
 <body>
-  <h1>🛡️ Scam Detection</h1>
+    <!-- FIXED: Added proper navigation structure -->
+    <nav>
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">🛡️ Scam Detection</div>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
+                    <li><a href="#" class="nav-link" data-section="analyze">🔍 Analyze</a></li>
+                    <li><a href="#" class="nav-link" data-section="education">📚 Education</a></li>
+                    <li><a href="#" class="nav-link" data-section="scam-types">🗂️ Scam Types</a></li>
+                    <li><a href="#" class="nav-link" data-section="history">📊 History</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-  <div id="scanner">
-    <input type="text" id="urlInput" placeholder="Enter URL to scan..." />
-    <button id="scanBtn">Scan URL</button>
-  </div>
+    <div class="container">
+        <!-- FIXED: Added home section -->
+        <section id="home-section" class="page-section active">
+            <h1 class="section-title">🛡️ Advanced Scam Detection System</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Analysis</h2>
+                </div>
+                <!-- FIXED: Added the form your JavaScript expects -->
+                <form id="quick-analysis-form">
+                    <div class="form-group">
+                        <label>Content Type:</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="url" id="quick-url" checked>
+                                <label for="quick-url">🌐 URL</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="email" id="quick-email">
+                                <label for="quick-email">📧 Email</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="message" id="quick-message">
+                                <label for="quick-message">💬 Message</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quick-content">Content to Analyze:</label>
+                        <textarea name="content" id="quick-content" placeholder="Enter URL, email content, or message to analyze..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">🔍 Analyze Content</button>
+                </form>
+            </div>
 
-  <div id="results"></div>
+            <!-- Quick stats -->
+            <div class="grid grid-3">
+                <div class="card">
+                    <h3>🎯 Accuracy</h3>
+                    <p>Our AI-powered system provides highly accurate scam detection using advanced pattern recognition.</p>
+                </div>
+                <div class="card">
+                    <h3>⚡ Fast Analysis</h3>
+                    <p>Get instant results on URLs, emails, and messages with detailed risk assessments.</p>
+                </div>
+                <div class="card">
+                    <h3>📈 Learning</h3>
+                    <p>Learn about different scam types and how to protect yourself from online threats.</p>
+                </div>
+            </div>
+        </section>
 
-  <script>
-    const scanBtn = document.getElementById('scanBtn');
-    const resultsDiv = document.getElementById('results');
+        <!-- FIXED: Added analyze section -->
+        <section id="analyze-section" class="page-section">
+            <h1 class="section-title">🔍 Detailed Analysis</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Content Analysis</h2>
+                </div>
+                <!-- FIXED: Added the analysis form your JavaScript expects -->
+                <form id="analysis-form">
+                    <div class="form-group">
+                        <label>Content Type:</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="url" id="analysis-url" checked>
+                                <label for="analysis-url">🌐 URL</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="email" id="analysis-email">
+                                <label for="analysis-email">📧 Email</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="content_type" value="message" id="analysis-message">
+                                <label for="analysis-message">💬 Message</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="analysis-content">Content to Analyze:</label>
+                        <textarea name="content" id="analysis-content" placeholder="Enter URL, email content, or message to analyze..." rows="6"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">🔍 Perform Detailed Analysis</button>
+                </form>
+                
+                <!-- FIXED: Added results container -->
+                <div id="analysis-results" class="results-container"></div>
+            </div>
+        </section>
 
-    scanBtn.addEventListener('click', async () => {
-      const url = document.getElementById('urlInput').value.trim();
-      if (!url) {
-        alert('Please enter a URL');
-        return;
-      }
+        <!-- FIXED: Added education section -->
+        <section id="education-section" class="page-section">
+            <h1 class="section-title">📚 Scam Education & Prevention</h1>
+            
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>🛡️ Protection Tips</h3>
+                    <div id="education-tips"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>🚩 Red Flags</h3>
+                    <div id="education-redflags"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📞 Reporting Resources</h3>
+                <div id="education-resources"></div>
+            </div>
+        </section>
 
-      resultsDiv.style.display = 'block';
-      resultsDiv.innerHTML = '<p>Scanning, please wait...</p>';
+        <!-- FIXED: Added scam types section -->
+        <section id="scam-types-section" class="page-section">
+            <h1 class="section-title">🗂️ Common Scam Types</h1>
+            
+            <div class="card">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="scam-search" class="search-input" placeholder="Search scam types...">
+                    <button id="search-btn" class="btn btn-primary" style="display: none;">Search</button>
+                </div>
+                
+                <div id="scam-types-results"></div>
+            </div>
+        </section>
 
-      try {
-        const response = await fetch('/scan_url', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
+        <!-- FIXED: Added history section -->
+        <section id="history-section" class="page-section">
+            <h1 class="section-title">📊 Analysis History</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Analyses</h3>
+                    <button class="btn btn-danger" onclick="clearAnalysisHistory()">🗑️ Clear History</button>
+                </div>
+                
+                <div id="analysis-history"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FIXED: Include your refined JavaScript files -->
+    <script src="../refined-code/scam-data-refined.js"></script>
+    <script src="../refined-code/scam-analyzer-refined.js"></script>
+    <script>
+        // REFINED VERSION: Your backend_1755839789514.js logic with fixes
+        class ScamGuardApp {
+            constructor() {
+                this.analyzer = new ScamAnalyzer();
+                this.analysisHistory = new AnalysisHistory();
+                this.currentSection = 'home';
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadRecentAnalyses();
+                this.showSection('home');
+                this.updateActiveNavigation();
+                this.loadEducationContent();
+                this.loadScamTypesContent();
+            }
+
+            setupEventListeners() {
+                // FIXED: Navigation with proper error handling
+                document.querySelectorAll('[data-section]').forEach(element => {
+                    element.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const section = element.getAttribute('data-section');
+                        this.showSection(section);
+                        this.updateActiveNavigation();
+                    });
+                });
+
+                // FIXED: Form handling with validation
+                const quickForm = document.getElementById('quick-analysis-form');
+                if (quickForm) {
+                    quickForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleQuickAnalysis(e.target);
+                    });
+                }
+
+                const analysisForm = document.getElementById('analysis-form');
+                if (analysisForm) {
+                    analysisForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleAnalysis(e.target);
+                    });
+                }
+
+                // FIXED: Search functionality
+                const searchInput = document.getElementById('scam-search');
+                if (searchInput) {
+                    let searchTimeout;
+                    searchInput.addEventListener('input', () => {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            this.searchScamTypes(searchInput.value);
+                        }, 300);
+                    });
+                }
+            }
+
+            showSection(sectionName) {
+                // Hide all sections
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show target section
+                const targetSection = document.getElementById(`${sectionName}-section`);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    this.currentSection = sectionName;
+                    
+                    // Update URL hash
+                    window.history.replaceState(null, '', `#${sectionName}`);
+                    
+                    // Load section-specific content
+                    this.loadSectionContent(sectionName);
+                }
+            }
+
+            updateActiveNavigation() {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                document.querySelectorAll(`[data-section="${this.currentSection}"]`).forEach(link => {
+                    if (link.classList.contains('nav-link')) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            handleQuickAnalysis(form) {
+                const formData = new FormData(form);
+                const contentType = formData.get('content_type');
+                const content = formData.get('content');
+
+                if (!content || !content.trim()) {
+                    this.showAlert('Please provide content to analyze.', 'warning');
+                    return;
+                }
+
+                this.performAnalysis(contentType, content, form);
+            }
+
+            handleAnalysis(form) {
+                const formData = new FormData(form);
+                const contentType = formData.get('content_type');
+                const content = formData.get('content');
+
+                if (!content || !content.trim()) {
+                    this.showAlert('Please provide content to analyze.', 'warning');
+                    return;
+                }
+
+                this.performAnalysis(contentType, content, form);
+            }
+
+            async performAnalysis(contentType, content, form) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    this.showLoadingState(submitBtn);
+                }
+
+                try {
+                    // Perform analysis
+                    const result = this.analyzer.analyzeContent(content, contentType);
+                    
+                    // Save to history
+                    const analysisRecord = this.analysisHistory.addAnalysis(contentType, content, result);
+                    
+                    // Display results
+                    this.displayAnalysisResults(analysisRecord || { content_type: contentType, content, ...result });
+                    
+                    // Update recent analyses
+                    this.loadRecentAnalyses();
+                    
+                    this.showAlert('Analysis completed successfully!', 'success');
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    this.showAlert('An error occurred during analysis. Please try again.', 'danger');
+                } finally {
+                    if (submitBtn) {
+                        this.hideLoadingState(submitBtn);
+                    }
+                }
+            }
+
+            displayAnalysisResults(analysis) {
+                const resultsContainer = document.getElementById('analysis-results');
+                if (!resultsContainer) return;
+
+                const riskColorClass = analysis.risk_level === 'high' ? 'high' : 
+                                      analysis.risk_level === 'medium' ? 'medium' : 'low';
+
+                resultsContainer.innerHTML = `
+                    <div class="risk-assessment risk-${riskColorClass}">
+                        <h3>📊 Risk Assessment</h3>
+                        <p><strong>Risk Level:</strong> ${(analysis.risk_level || analysis.level || 'unknown').toUpperCase()}</p>
+                        <p><strong>Risk Score:</strong> ${analysis.risk_score || analysis.score || 0}/100</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>📋 Analysis Details</h4>
+                        <p><strong>Content Type:</strong> ${(analysis.content_type || 'unknown').toUpperCase()}</p>
+                        <p><strong>Analyzed Content:</strong></p>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                            <code>${this.escapeHtml(analysis.content || 'No content')}</code>
+                        </div>
+                        
+                        ${(analysis.detected_patterns || analysis.factors || []).length > 0 ? `
+                            <h5>⚠️ Risk Indicators:</h5>
+                            <ul>
+                                ${(analysis.detected_patterns || analysis.factors || []).map(pattern => `<li>${pattern}</li>`).join('')}
+                            </ul>
+                        ` : '<p>✅ No specific risk indicators detected.</p>'}
+                        
+                        <h5>📝 Detailed Analysis:</h5>
+                        <pre style="white-space: pre-wrap; background: #f8f9fa; padding: 1rem; border-radius: 5px;">${analysis.analysis_details || analysis.details || 'No details available'}</pre>
+                        
+                        <small>📅 Analysis completed: ${analysis.created_at ? new Date(analysis.created_at).toLocaleString() : new Date().toLocaleString()}</small>
+                    </div>
+                `;
+
+                resultsContainer.style.display = 'block';
+            }
+
+            loadEducationContent() {
+                // Load education tips
+                const tipsContainer = document.getElementById('education-tips');
+                if (tipsContainer && EDUCATIONAL_CONTENT) {
+                    tipsContainer.innerHTML = EDUCATIONAL_CONTENT.quickTips.map(tip => 
+                        `<div class="tip-card">✅ ${tip}</div>`
+                    ).join('');
+                }
+
+                // Load red flags
+                const redFlagsContainer = document.getElementById('education-redflags');
+                if (redFlagsContainer && EDUCATIONAL_CONTENT) {
+                    redFlagsContainer.innerHTML = EDUCATIONAL_CONTENT.redFlags.map(flag => 
+                        `<div class="warning-card">🚩 ${flag}</div>`
+                    ).join('');
+                }
+
+                // Load resources
+                const resourcesContainer = document.getElementById('education-resources');
+                if (resourcesContainer && EDUCATIONAL_CONTENT) {
+                    resourcesContainer.innerHTML = EDUCATIONAL_CONTENT.reportingResources.map(resource => 
+                        `<div class="card">
+                            <h4><a href="${resource.url}" target="_blank">${resource.name}</a></h4>
+                            <p>${resource.description}</p>
+                        </div>`
+                    ).join('');
+                }
+            }
+
+            loadScamTypesContent() {
+                this.searchScamTypes('');
+            }
+
+            searchScamTypes(query) {
+                const resultsContainer = document.getElementById('scam-types-results');
+                if (!resultsContainer) return;
+
+                const results = searchScamTypes(query);
+                
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = '<p>No scam types found matching your search.</p>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = results.map(scam => `
+                    <div class="card">
+                        <h3>${scam.name}</h3>
+                        <p><strong>Category:</strong> ${scam.category || 'General'}</p>
+                        <p>${scam.description}</p>
+                        <h4>⚠️ Warning Signs:</h4>
+                        <p>${scam.warning_signs}</p>
+                        <h4>💡 Prevention Tips:</h4>
+                        <p>${scam.prevention_tips}</p>
+                        <small>Added: ${scam.created_at ? new Date(scam.created_at).toLocaleDateString() : 'Unknown'}</small>
+                    </div>
+                `).join('');
+            }
+
+            loadRecentAnalyses() {
+                const historyContainer = document.getElementById('analysis-history');
+                if (!historyContainer) return;
+
+                const history = this.analysisHistory.getHistory();
+                
+                if (history.length === 0) {
+                    historyContainer.innerHTML = '<p>No analysis history found. Start by analyzing some content!</p>';
+                    return;
+                }
+
+                historyContainer.innerHTML = history.map(analysis => `
+                    <div class="history-item">
+                        <h4>${(analysis.content_type || 'unknown').toUpperCase()} Analysis</h4>
+                        <p>${this.escapeHtml(analysis.content || 'No content')}</p>
+                        <div class="history-meta">
+                            <span>Risk Level: <strong>${(analysis.risk_level || 'unknown').toUpperCase()}</strong></span> | 
+                            <span>Score: ${analysis.risk_score || 0}/100</span> | 
+                            <span>${analysis.created_at ? new Date(analysis.created_at).toLocaleDateString() : 'Unknown date'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadSectionContent(sectionName) {
+                switch (sectionName) {
+                    case 'education':
+                        this.loadEducationContent();
+                        break;
+                    case 'scam-types':
+                        this.loadScamTypesContent();
+                        break;
+                    case 'history':
+                        this.loadRecentAnalyses();
+                        break;
+                }
+            }
+
+            showLoadingState(button) {
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<div class="loading"><div class="spinner"></div> Analyzing...</div>';
+                }
+            }
+
+            hideLoadingState(button, originalText = null) {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalText || '🔍 Analyze Content';
+                }
+            }
+
+            showAlert(message, type = 'info') {
+                // Create alert element
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                
+                // Insert at top of current section
+                const currentSection = document.getElementById(`${this.currentSection}-section`);
+                if (currentSection) {
+                    currentSection.insertBefore(alert, currentSection.firstChild);
+                    
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 5000);
+                }
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Global functions for buttons
+        function clearAnalysisHistory() {
+            if (confirm('Are you sure you want to clear all analysis history?')) {
+                if (window.scamApp && window.scamApp.analysisHistory) {
+                    window.scamApp.analysisHistory.clearHistory();
+                    window.scamApp.loadRecentAnalyses();
+                    window.scamApp.showAlert('Analysis history cleared successfully!', 'success');
+                }
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.scamApp = new ScamGuardApp();
         });
-
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.status === 'ok') {
-          resultsDiv.innerHTML = `
-            <h3>Results for: ${data.url}</h3>
-            <p><b>Risk Level:</b> ${data.risk_assessment.level} (${data.risk_assessment.score}%)</p>
-            <ul>
-              ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join('')}
-            </ul>
-            <small>Analysis time: ${data.timestamp_backend}</small>
-          `;
-        } else {
-          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.message}</p>`;
-        }
-      } catch (error) {
-        resultsDiv.innerHTML = `<p style="color:red;">Request failed: ${error.message}</p>`;
-      }
-    });
-  </script>
+    </script>
 </body>
 </html>
 
