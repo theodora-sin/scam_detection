@@ -1,4 +1,6 @@
- // Scam Analysis Engine - JavaScript Implementation
+// REFINED VERSION of routes_1755839789513.js
+// Fixed: Better error handling, consistent return format, modular design
+
 class ScamAnalyzer {
     constructor() {
         // Define scam patterns for different content types
@@ -42,215 +44,163 @@ class ScamAnalyzer {
         ];
     }
 
+    // FIXED: Main analysis method with consistent interface
     analyzeContent(content, contentType) {
         try {
-            if (contentType === 'url') {
-                return this._analyzeUrl(content);
-            } else if (contentType === 'email') {
-                return this._analyzeEmail(content);
-            } else if (contentType === 'message') {
-                return this._analyzeMessage(content);
-            } else {
-                throw new Error(`Unsupported content type: ${contentType}`);
+            if (!content || !contentType) {
+                throw new Error('Content and content type are required');
+            }
+
+            switch (contentType.toLowerCase()) {
+                case 'url':
+                    return this._analyzeUrl(content);
+                case 'email':
+                    return this._analyzeEmail(content);
+                case 'message':
+                    return this._analyzeMessage(content);
+                default:
+                    throw new Error(`Unsupported content type: ${contentType}`);
             }
         } catch (error) {
             console.error('Analysis error:', error);
-            return {
-                risk_level: 'unknown',
-                risk_score: 0,
-                detected_patterns: [],
-                analysis_details: `Error during analysis: ${error.message}`
-            };
+            return this._createErrorResult(error.message);
         }
     }
 
+    // FIXED: Consistent error result format
+    _createErrorResult(message) {
+        return {
+            level: 'unknown',
+            score: 0,
+            factors: [],
+            details: `Error during analysis: ${message}`,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    // FIXED: Better URL validation and consistent return format
     _analyzeUrl(url) {
         let riskScore = 0;
-        let detectedPatterns = [];
+        const detectedPatterns = [];
         
         // Validate URL format
         try {
-            new URL(url);
+            const urlObj = new URL(url);
+            // Additional URL validation
+            if (!urlObj.protocol.startsWith('http')) {
+                throw new Error('Invalid protocol');
+            }
         } catch (error) {
             return {
-                risk_level: 'high',
-                risk_score: 100,
-                detected_patterns: ['Invalid URL format'],
-                analysis_details: 'The provided URL is not properly formatted.'
+                level: 'high',
+                score: 100,
+                factors: ['Invalid URL format'],
+                details: 'The provided URL is not properly formatted or uses an invalid protocol.',
+                timestamp: new Date().toISOString()
             };
         }
         
         // Check URL patterns
-        for (const { pattern, description, score } of this.urlPatterns) {
-            if (pattern.test(url)) {
-                riskScore += score;
-                detectedPatterns.push(description);
-            }
-        }
+        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
         
         // Check for legitimate patterns
-        for (const { pattern, description, score } of this.legitimatePatterns) {
-            if (pattern.test(url)) {
-                riskScore += score; // score is negative for legitimate patterns
-            }
-        }
+        riskScore += this._checkPatterns(url, this.legitimatePatterns, []);
         
-        const riskLevel = this._calculateRiskLevel(riskScore);
-        const analysisDetails = this._generateUrlAnalysisDetails(url, riskScore, detectedPatterns);
-        
-        return {
-            risk_level: riskLevel,
-            risk_score: Math.max(0, riskScore),
-            detected_patterns: detectedPatterns,
-            analysis_details: analysisDetails
-        };
+        return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
 
+    // FIXED: Email analysis with better pattern matching
     _analyzeEmail(emailContent) {
         let riskScore = 0;
-        let detectedPatterns = [];
+        const detectedPatterns = [];
         
         // Check email patterns
-        for (const { pattern, description, score } of this.emailPatterns) {
-            if (pattern.test(emailContent)) {
-                riskScore += score;
-                detectedPatterns.push(description);
-            }
-        }
+        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
         
         // Check for legitimate patterns
-        for (const { pattern, description, score } of this.legitimatePatterns) {
-            if (pattern.test(emailContent)) {
-                riskScore += score;
-            }
-        }
+        riskScore += this._checkPatterns(emailContent, this.legitimatePatterns, []);
         
-        const riskLevel = this._calculateRiskLevel(riskScore);
-        const analysisDetails = this._generateEmailAnalysisDetails(emailContent, riskScore, detectedPatterns);
-        
-        return {
-            risk_level: riskLevel,
-            risk_score: Math.max(0, riskScore),
-            detected_patterns: detectedPatterns,
-            analysis_details: analysisDetails
-        };
+        return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
     }
 
+    // FIXED: Message analysis
     _analyzeMessage(message) {
         let riskScore = 0;
-        let detectedPatterns = [];
+        const detectedPatterns = [];
         
         // Check message patterns
-        for (const { pattern, description, score } of this.messagePatterns) {
-            if (pattern.test(message)) {
-                riskScore += score;
-                detectedPatterns.push(description);
-            }
-        }
+        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
         
         // Check for legitimate patterns
-        for (const { pattern, description, score } of this.legitimatePatterns) {
-            if (pattern.test(message)) {
-                riskScore += score;
+        riskScore += this._checkPatterns(message, this.legitimatePatterns, []);
+        
+        return this._formatResult(riskScore, detectedPatterns, message, 'Message');
+    }
+
+    // ADDED: Helper method to check patterns (DRY principle)
+    _checkPatterns(content, patterns, detectedPatterns) {
+        let score = 0;
+        for (const { pattern, description, score: patternScore } of patterns) {
+            if (pattern.test(content)) {
+                score += patternScore;
+                if (patternScore > 0) { // Only add positive scores to detected patterns
+                    detectedPatterns.push(description);
+                }
             }
         }
-        
-        const riskLevel = this._calculateRiskLevel(riskScore);
-        const analysisDetails = this._generateMessageAnalysisDetails(message, riskScore, detectedPatterns);
+        return score;
+    }
+
+    // ADDED: Consistent result formatting
+    _formatResult(riskScore, detectedPatterns, content, contentType) {
+        const finalScore = Math.max(0, riskScore);
+        const level = this._calculateRiskLevel(finalScore);
         
         return {
-            risk_level: riskLevel,
-            risk_score: Math.max(0, riskScore),
-            detected_patterns: detectedPatterns,
-            analysis_details: analysisDetails
+            level,
+            score: finalScore,
+            factors: detectedPatterns,
+            details: this._generateAnalysisDetails(contentType, content, finalScore, detectedPatterns),
+            timestamp: new Date().toISOString()
         };
     }
 
+    // FIXED: Better risk level calculation
     _calculateRiskLevel(riskScore) {
-        if (riskScore >= 60) {
-            return 'high';
-        } else if (riskScore >= 30) {
-            return 'medium';
-        } else {
-            return 'low';
-        }
+        if (riskScore >= 60) return 'high';
+        if (riskScore >= 30) return 'medium';
+        return 'low';
     }
 
-    _generateUrlAnalysisDetails(url, riskScore, patterns) {
-        let details = `URL Analysis for: ${url}\n\n`;
-        details += `Risk Score: ${Math.max(0, riskScore)}/100\n\n`;
+    // ADDED: Better analysis details generation
+    _generateAnalysisDetails(contentType, content, riskScore, patterns) {
+        let details = `${contentType} Analysis Summary:\n\n`;
+        details += `Risk Score: ${riskScore}/100\n`;
+        details += `Risk Level: ${this._calculateRiskLevel(riskScore).toUpperCase()}\n\n`;
         
         if (patterns.length > 0) {
-            details += "Detected Risk Indicators:\n";
-            for (const pattern of patterns) {
-                details += `• ${pattern}\n`;
-            }
+            details += "Risk Indicators Found:\n";
+            patterns.forEach(pattern => details += `• ${pattern}\n`);
         } else {
-            details += "No specific risk indicators detected in the URL structure.\n";
+            details += "No specific risk indicators detected.\n";
         }
         
         details += "\nRecommendations:\n";
         if (riskScore >= 60) {
-            details += "• Do not visit this URL\n• This appears to be a high-risk website\n• Report this URL if received unsolicited";
+            details += "• HIGH RISK: Avoid this content\n• Do not interact or provide information\n• Report if received unsolicited";
         } else if (riskScore >= 30) {
-            details += "• Exercise caution before visiting\n• Verify the source of this URL\n• Don't enter personal information";
+            details += "• MEDIUM RISK: Exercise caution\n• Verify source independently\n• Avoid sharing personal information";
         } else {
-            details += "• URL appears to be relatively safe\n• Still exercise normal web safety practices\n• Verify site authenticity if conducting transactions";
-        }
-        
-        return details;
-    }
-
-    _generateEmailAnalysisDetails(email, riskScore, patterns) {
-        let details = `Email Content Analysis\n\n`;
-        details += `Risk Score: ${Math.max(0, riskScore)}/100\n\n`;
-        
-        if (patterns.length > 0) {
-            details += "Detected Risk Indicators:\n";
-            for (const pattern of patterns) {
-                details += `• ${pattern}\n`;
-            }
-        } else {
-            details += "No specific risk indicators detected in the email content.\n";
-        }
-        
-        details += "\nRecommendations:\n";
-        if (riskScore >= 60) {
-            details += "• Do not respond to this email\n• Do not click any links\n• Mark as spam/phishing\n• Report to your email provider";
-        } else if (riskScore >= 30) {
-            details += "• Verify sender through alternative means\n• Be cautious of any requests for information\n• Don't click suspicious links";
-        } else {
-            details += "• Email appears relatively safe\n• Still verify sender identity for important requests\n• Exercise normal email safety practices";
-        }
-        
-        return details;
-    }
-
-    _generateMessageAnalysisDetails(message, riskScore, patterns) {
-        let details = `Message Content Analysis\n\n`;
-        details += `Risk Score: ${Math.max(0, riskScore)}/100\n\n`;
-        
-        if (patterns.length > 0) {
-            details += "Detected Risk Indicators:\n";
-            for (const pattern of patterns) {
-                details += `• ${pattern}\n`;
-            }
-        } else {
-            details += "No specific risk indicators detected in the message content.\n";
-        }
-        
-        details += "\nRecommendations:\n";
-        if (riskScore >= 60) {
-            details += "• Do not respond to this message\n• Do not send money or personal information\n• Block the sender\n• Report as suspected scam";
-        } else if (riskScore >= 30) {
-            details += "• Verify the sender's identity through other means\n• Be suspicious of any requests for money or information\n• Don't provide personal details";
-        } else {
-            details += "• Message appears relatively safe\n• Still be cautious with unsolicited communications\n• Verify identity for any important requests";
+            details += "• LOW RISK: Content appears relatively safe\n• Still exercise normal security practices\n• Verify authenticity for important matters";
         }
         
         return details;
     }
 }
 
-// Export for use in other files
-window.ScamAnalyzer = ScamAnalyzer;
+// Export for use in both browser and Node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ScamAnalyzer;
+} else if (typeof window !== 'undefined') {
+    window.ScamAnalyzer = ScamAnalyzer;
+}
