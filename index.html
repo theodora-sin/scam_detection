@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛡️ Advanced Scam Detection System</title>
-    
-    <!-- REFINED VERSION: Complete HTML structure for your backend_1755839789514.js -->
-    <!-- FIXED: All the missing elements your JavaScript expects -->
-    
+    <title>🛡️ Working Refined Scam Detection</title>
     <style>
-        /* Modern CSS with better organization */
         :root {
             --primary-color: #007BFF;
             --primary-hover: #0056b3;
@@ -41,7 +36,6 @@
             padding: 0 20px;
         }
 
-        /* Navigation */
         nav {
             background: white;
             box-shadow: var(--shadow);
@@ -84,7 +78,6 @@
             color: white;
         }
 
-        /* Page sections */
         .page-section {
             display: none;
             min-height: calc(100vh - 80px);
@@ -101,7 +94,6 @@
             color: var(--dark-text);
         }
 
-        /* Cards */
         .card {
             background: white;
             border-radius: 10px;
@@ -124,7 +116,6 @@
             color: var(--dark-text);
         }
 
-        /* Forms */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -160,7 +151,6 @@
             resize: vertical;
         }
 
-        /* Radio buttons for content type */
         .radio-group {
             display: flex;
             gap: 1rem;
@@ -187,7 +177,6 @@
             font-weight: 500;
         }
 
-        /* Buttons */
         .btn {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -209,22 +198,11 @@
             background: var(--primary-hover);
         }
 
-        .btn-danger {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
 
-        /* Results display */
         .results-container {
             margin-top: 2rem;
             display: none;
@@ -255,39 +233,15 @@
             color: #155724;
         }
 
-        /* Grid layouts */
         .grid {
             display: grid;
             gap: 2rem;
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         }
 
         .grid-3 {
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         }
 
-        /* Search */
-        .search-container {
-            position: relative;
-            margin-bottom: 2rem;
-        }
-
-        .search-input {
-            padding-left: 3rem;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-
-        /* Loading states */
         .loading {
             display: flex;
             align-items: center;
@@ -309,28 +263,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .nav-link {
-                font-size: 0.9rem;
-                padding: 0.4rem 0.8rem;
-            }
-
-            .radio-group {
-                flex-direction: column;
-            }
-
-            .grid-2,
-            .grid-3 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Alert styles */
         .alert {
             padding: 1rem;
             border-radius: 5px;
@@ -356,70 +288,48 @@
             color: #856404;
         }
 
-        /* Education content styles */
-        .tip-card {
-            background: #e8f5e8;
-            border-left: 4px solid var(--success-color);
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
 
-        .warning-card {
-            background: #fff3cd;
-            border-left: 4px solid var(--warning-color);
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
 
-        /* Analysis history */
-        .history-item {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+            .radio-group {
+                flex-direction: column;
+            }
 
-        .history-item:hover {
-            box-shadow: var(--shadow);
-        }
-
-        .history-meta {
-            font-size: 0.875rem;
-            color: #6c757d;
-            margin-top: 0.5rem;
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- FIXED: Added proper navigation structure -->
     <nav>
         <div class="container">
             <div class="nav-container">
-                <div class="logo">🛡️ Scam Detection</div>
+                <div class="logo">🛡️ Refined Scam Detection</div>
                 <ul class="nav-links">
                     <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
                     <li><a href="#" class="nav-link" data-section="analyze">🔍 Analyze</a></li>
-                    <li><a href="#" class="nav-link" data-section="education">📚 Education</a></li>
-                    <li><a href="#" class="nav-link" data-section="scam-types">🗂️ Scam Types</a></li>
-                    <li><a href="#" class="nav-link" data-section="history">📊 History</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        <!-- FIXED: Added home section -->
+        <!-- Home Section -->
         <section id="home-section" class="page-section active">
-            <h1 class="section-title">🛡️ Advanced Scam Detection System</h1>
+            <h1 class="section-title">🛡️ Refined Scam Detection System</h1>
             
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Quick Analysis</h2>
                 </div>
-                <!-- FIXED: Added the form your JavaScript expects -->
                 <form id="quick-analysis-form">
                     <div class="form-group">
                         <label>Content Type:</label>
@@ -441,31 +351,32 @@
                     
                     <div class="form-group">
                         <label for="quick-content">Content to Analyze:</label>
-                        <textarea name="content" id="quick-content" placeholder="Enter URL, email content, or message to analyze..."></textarea>
+                        <textarea name="content" id="quick-content" placeholder="Enter URL, email content, or message to analyze...">http://bit.ly/suspicious-link</textarea>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">🔍 Analyze Content</button>
                 </form>
+                
+                <div id="quick-results" class="results-container"></div>
             </div>
 
-            <!-- Quick stats -->
             <div class="grid grid-3">
                 <div class="card">
-                    <h3>🎯 Accuracy</h3>
-                    <p>Our AI-powered system provides highly accurate scam detection using advanced pattern recognition.</p>
+                    <h3>🎯 Refined Analysis</h3>
+                    <p>This is the refined version of your original code with better error handling and consistent formats.</p>
                 </div>
                 <div class="card">
-                    <h3>⚡ Fast Analysis</h3>
-                    <p>Get instant results on URLs, emails, and messages with detailed risk assessments.</p>
+                    <h3>⚡ Pattern Detection</h3>
+                    <p>Uses your original scam detection patterns but with improved organization and accuracy.</p>
                 </div>
                 <div class="card">
-                    <h3>📈 Learning</h3>
-                    <p>Learn about different scam types and how to protect yourself from online threats.</p>
+                    <h3>📊 Clear Results</h3>
+                    <p>Displays detailed risk assessments with explanations of detected threats.</p>
                 </div>
             </div>
         </section>
 
-        <!-- FIXED: Added analyze section -->
+        <!-- Analyze Section -->
         <section id="analyze-section" class="page-section">
             <h1 class="section-title">🔍 Detailed Analysis</h1>
             
@@ -473,7 +384,6 @@
                 <div class="card-header">
                     <h2 class="card-title">Content Analysis</h2>
                 </div>
-                <!-- FIXED: Added the analysis form your JavaScript expects -->
                 <form id="analysis-form">
                     <div class="form-group">
                         <label>Content Type:</label>
@@ -501,68 +411,233 @@
                     <button type="submit" class="btn btn-primary">🔍 Perform Detailed Analysis</button>
                 </form>
                 
-                <!-- FIXED: Added results container -->
                 <div id="analysis-results" class="results-container"></div>
-            </div>
-        </section>
-
-        <!-- FIXED: Added education section -->
-        <section id="education-section" class="page-section">
-            <h1 class="section-title">📚 Scam Education & Prevention</h1>
-            
-            <div class="grid grid-2">
-                <div class="card">
-                    <h3>🛡️ Protection Tips</h3>
-                    <div id="education-tips"></div>
-                </div>
-                
-                <div class="card">
-                    <h3>🚩 Red Flags</h3>
-                    <div id="education-redflags"></div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>📞 Reporting Resources</h3>
-                <div id="education-resources"></div>
-            </div>
-        </section>
-
-        <!-- FIXED: Added scam types section -->
-        <section id="scam-types-section" class="page-section">
-            <h1 class="section-title">🗂️ Common Scam Types</h1>
-            
-            <div class="card">
-                <div class="search-container">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="scam-search" class="search-input" placeholder="Search scam types...">
-                    <button id="search-btn" class="btn btn-primary" style="display: none;">Search</button>
-                </div>
-                
-                <div id="scam-types-results"></div>
-            </div>
-        </section>
-
-        <!-- FIXED: Added history section -->
-        <section id="history-section" class="page-section">
-            <h1 class="section-title">📊 Analysis History</h1>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Analyses</h3>
-                    <button class="btn btn-danger" onclick="clearAnalysisHistory()">🗑️ Clear History</button>
-                </div>
-                
-                <div id="analysis-history"></div>
             </div>
         </section>
     </div>
 
-    <!-- FIXED: Include your refined JavaScript files -->
-    <script src="../refined-code/scam-data-refined.js"></script>
-    <script src="../refined-code/scam-analyzer-refined.js"></script>
     <script>
-        // REFINED VERSION: Your backend_1755839789514.js logic with fixes
+        // REFINED SCAM ANALYZER - All JavaScript included inline to avoid 404 errors
+        
+        // Analysis History Storage
+        class AnalysisHistory {
+            constructor() {
+                this.storageKey = 'scamguard_analysis_history';
+                this.maxEntries = 50;
+            }
+
+            addAnalysis(contentType, content, result) {
+                try {
+                    const history = this.getHistory();
+                    const analysis = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        content_type: contentType,
+                        content: content.length > 100 ? content.slice(0, 100) + '...' : content,
+                        risk_level: result.level || 'unknown',
+                        risk_score: result.score || 0,
+                        detected_patterns: result.factors || [],
+                        analysis_details: result.details || 'No details available',
+                        created_at: new Date().toISOString()
+                    };
+
+                    history.unshift(analysis);
+                    
+                    if (history.length > this.maxEntries) {
+                        history.splice(this.maxEntries);
+                    }
+                    
+                    localStorage.setItem(this.storageKey, JSON.stringify(history));
+                    return analysis;
+                } catch (error) {
+                    console.error('Error adding analysis to history:', error);
+                    return null;
+                }
+            }
+
+            getHistory() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    return stored ? JSON.parse(stored) : [];
+                } catch (error) {
+                    console.error('Error loading analysis history:', error);
+                    return [];
+                }
+            }
+        }
+
+        // REFINED SCAM ANALYZER CLASS
+        class ScamAnalyzer {
+            constructor() {
+                this.urlPatterns = [
+                    { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 20 },
+                    { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 30 },
+                    { pattern: /(paypal|amazon|microsoft|apple|google).*-.*\.com/i, description: 'Suspicious domain mimicking legitimate service', score: 40 },
+                    { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf)/i, description: 'Free domain hosting', score: 25 },
+                    { pattern: /(secure|verify|update|confirm).*account/i, description: 'Account security keywords', score: 15 },
+                    { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 20 }
+                ];
+                
+                this.emailPatterns = [
+                    { pattern: /urgent|immediate|act now|limited time|expires today/i, description: 'Urgency tactics', score: 25 },
+                    { pattern: /verify your account|suspend|locked|frozen/i, description: 'Account threat language', score: 30 },
+                    { pattern: /click here|download now|claim your prize/i, description: 'Suspicious call-to-action', score: 20 },
+                    { pattern: /winner|congratulations|lottery|prize/i, description: 'Prize/lottery scam language', score: 35 },
+                    { pattern: /wire transfer|western union|moneygram|bitcoin/i, description: 'Unusual payment methods', score: 40 },
+                    { pattern: /dear (customer|sir|madam)/i, description: 'Generic greeting', score: 15 },
+                    { pattern: /[A-Z]{3,}\s+[A-Z]{3,}\s+[A-Z]{3,}/, description: 'Excessive capitalization', score: 10 },
+                    { pattern: /(\$|€|£)\s*\d{4,}/, description: 'Large money amounts', score: 20 },
+                    { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz)/i, description: 'Suspicious sender domain', score: 30 }
+                ];
+                
+                this.messagePatterns = [
+                    { pattern: /romance|love|heart|marry|relationship/i, description: 'Romance scam language', score: 25 },
+                    { pattern: /investment|profit|return|guarantee|double/i, description: 'Investment scam language', score: 30 },
+                    { pattern: /tech support|computer|virus|infected|microsoft/i, description: 'Tech support scam', score: 35 },
+                    { pattern: /social security|ssn|government|irs|arrest/i, description: 'Government impersonation', score: 40 },
+                    { pattern: /emergency|hospital|accident|help/i, description: 'Emergency scam tactics', score: 25 },
+                    { pattern: /inheritance|beneficiary|estate|attorney/i, description: 'Inheritance scam', score: 35 },
+                    { pattern: /(whatsapp|telegram)\s*(chat|message|contact)/i, description: 'Suspicious communication platform', score: 20 }
+                ];
+                
+                this.legitimatePatterns = [
+                    { pattern: /https:\/\/.*\.gov\//i, description: 'Government website', score: -20 },
+                    { pattern: /https:\/\/.*\.(edu|org)\//i, description: 'Educational/non-profit domain', score: -10 },
+                    { pattern: /contact us|customer service|help center/i, description: 'Customer service language', score: -5 },
+                    { pattern: /privacy policy|terms of service|unsubscribe/i, description: 'Legitimate website elements', score: -10 }
+                ];
+            }
+
+            analyzeContent(content, contentType) {
+                try {
+                    if (!content || !contentType) {
+                        throw new Error('Content and content type are required');
+                    }
+
+                    switch (contentType.toLowerCase()) {
+                        case 'url':
+                            return this._analyzeUrl(content);
+                        case 'email':
+                            return this._analyzeEmail(content);
+                        case 'message':
+                            return this._analyzeMessage(content);
+                        default:
+                            throw new Error(`Unsupported content type: ${contentType}`);
+                    }
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    return {
+                        level: 'unknown',
+                        score: 0,
+                        factors: [],
+                        details: `Error during analysis: ${error.message}`,
+                        timestamp: new Date().toISOString()
+                    };
+                }
+            }
+
+            _analyzeUrl(url) {
+                let riskScore = 0;
+                const detectedPatterns = [];
+                
+                try {
+                    const urlObj = new URL(url);
+                    if (!urlObj.protocol.startsWith('http')) {
+                        throw new Error('Invalid protocol');
+                    }
+                } catch (error) {
+                    return {
+                        level: 'high',
+                        score: 100,
+                        factors: ['Invalid URL format'],
+                        details: 'The provided URL is not properly formatted or uses an invalid protocol.',
+                        timestamp: new Date().toISOString()
+                    };
+                }
+                
+                riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+                riskScore += this._checkPatterns(url, this.legitimatePatterns, []);
+                
+                return this._formatResult(riskScore, detectedPatterns, url, 'URL');
+            }
+
+            _analyzeEmail(emailContent) {
+                let riskScore = 0;
+                const detectedPatterns = [];
+                
+                riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+                riskScore += this._checkPatterns(emailContent, this.legitimatePatterns, []);
+                
+                return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
+            }
+
+            _analyzeMessage(message) {
+                let riskScore = 0;
+                const detectedPatterns = [];
+                
+                riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+                riskScore += this._checkPatterns(message, this.legitimatePatterns, []);
+                
+                return this._formatResult(riskScore, detectedPatterns, message, 'Message');
+            }
+
+            _checkPatterns(content, patterns, detectedPatterns) {
+                let score = 0;
+                for (const { pattern, description, score: patternScore } of patterns) {
+                    if (pattern.test(content)) {
+                        score += patternScore;
+                        if (patternScore > 0) {
+                            detectedPatterns.push(description);
+                        }
+                    }
+                }
+                return score;
+            }
+
+            _formatResult(riskScore, detectedPatterns, content, contentType) {
+                const finalScore = Math.max(0, riskScore);
+                const level = this._calculateRiskLevel(finalScore);
+                
+                return {
+                    level,
+                    score: finalScore,
+                    factors: detectedPatterns,
+                    details: this._generateAnalysisDetails(contentType, content, finalScore, detectedPatterns),
+                    timestamp: new Date().toISOString()
+                };
+            }
+
+            _calculateRiskLevel(riskScore) {
+                if (riskScore >= 60) return 'high';
+                if (riskScore >= 30) return 'medium';
+                return 'low';
+            }
+
+            _generateAnalysisDetails(contentType, content, riskScore, patterns) {
+                let details = `${contentType} Analysis Summary:\n\n`;
+                details += `Risk Score: ${riskScore}/100\n`;
+                details += `Risk Level: ${this._calculateRiskLevel(riskScore).toUpperCase()}\n\n`;
+                
+                if (patterns.length > 0) {
+                    details += "Risk Indicators Found:\n";
+                    patterns.forEach(pattern => details += `• ${pattern}\n`);
+                } else {
+                    details += "No specific risk indicators detected.\n";
+                }
+                
+                details += "\nRecommendations:\n";
+                if (riskScore >= 60) {
+                    details += "• HIGH RISK: Avoid this content\n• Do not interact or provide information\n• Report if received unsolicited";
+                } else if (riskScore >= 30) {
+                    details += "• MEDIUM RISK: Exercise caution\n• Verify source independently\n• Avoid sharing personal information";
+                } else {
+                    details += "• LOW RISK: Content appears relatively safe\n• Still exercise normal security practices\n• Verify authenticity for important matters";
+                }
+                
+                return details;
+            }
+        }
+
+        // MAIN APPLICATION CLASS
         class ScamGuardApp {
             constructor() {
                 this.analyzer = new ScamAnalyzer();
@@ -574,15 +649,12 @@
 
             init() {
                 this.setupEventListeners();
-                this.loadRecentAnalyses();
                 this.showSection('home');
                 this.updateActiveNavigation();
-                this.loadEducationContent();
-                this.loadScamTypesContent();
             }
 
             setupEventListeners() {
-                // FIXED: Navigation with proper error handling
+                // Navigation
                 document.querySelectorAll('[data-section]').forEach(element => {
                     element.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -592,7 +664,7 @@
                     });
                 });
 
-                // FIXED: Form handling with validation
+                // Quick analysis form
                 const quickForm = document.getElementById('quick-analysis-form');
                 if (quickForm) {
                     quickForm.addEventListener('submit', (e) => {
@@ -601,6 +673,7 @@
                     });
                 }
 
+                // Detailed analysis form
                 const analysisForm = document.getElementById('analysis-form');
                 if (analysisForm) {
                     analysisForm.addEventListener('submit', (e) => {
@@ -608,37 +681,17 @@
                         this.handleAnalysis(e.target);
                     });
                 }
-
-                // FIXED: Search functionality
-                const searchInput = document.getElementById('scam-search');
-                if (searchInput) {
-                    let searchTimeout;
-                    searchInput.addEventListener('input', () => {
-                        clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(() => {
-                            this.searchScamTypes(searchInput.value);
-                        }, 300);
-                    });
-                }
             }
 
             showSection(sectionName) {
-                // Hide all sections
                 document.querySelectorAll('.page-section').forEach(section => {
                     section.classList.remove('active');
                 });
 
-                // Show target section
                 const targetSection = document.getElementById(`${sectionName}-section`);
                 if (targetSection) {
                     targetSection.classList.add('active');
                     this.currentSection = sectionName;
-                    
-                    // Update URL hash
-                    window.history.replaceState(null, '', `#${sectionName}`);
-                    
-                    // Load section-specific content
-                    this.loadSectionContent(sectionName);
                 }
             }
 
@@ -664,7 +717,7 @@
                     return;
                 }
 
-                this.performAnalysis(contentType, content, form);
+                this.performAnalysis(contentType, content, form, 'quick-results');
             }
 
             handleAnalysis(form) {
@@ -677,10 +730,10 @@
                     return;
                 }
 
-                this.performAnalysis(contentType, content, form);
+                this.performAnalysis(contentType, content, form, 'analysis-results');
             }
 
-            async performAnalysis(contentType, content, form) {
+            async performAnalysis(contentType, content, form, resultsContainerId) {
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) {
                     this.showLoadingState(submitBtn);
@@ -689,15 +742,13 @@
                 try {
                     // Perform analysis
                     const result = this.analyzer.analyzeContent(content, contentType);
+                    console.log('Analysis completed:', result);
                     
                     // Save to history
                     const analysisRecord = this.analysisHistory.addAnalysis(contentType, content, result);
                     
                     // Display results
-                    this.displayAnalysisResults(analysisRecord || { content_type: contentType, content, ...result });
-                    
-                    // Update recent analyses
-                    this.loadRecentAnalyses();
+                    this.displayAnalysisResults(analysisRecord || { content_type: contentType, content, ...result }, resultsContainerId);
                     
                     this.showAlert('Analysis completed successfully!', 'success');
                 } catch (error) {
@@ -710,8 +761,8 @@
                 }
             }
 
-            displayAnalysisResults(analysis) {
-                const resultsContainer = document.getElementById('analysis-results');
+            displayAnalysisResults(analysis, containerId) {
+                const resultsContainer = document.getElementById(containerId);
                 if (!resultsContainer) return;
 
                 const riskColorClass = analysis.risk_level === 'high' ? 'high' : 
@@ -749,102 +800,6 @@
                 resultsContainer.style.display = 'block';
             }
 
-            loadEducationContent() {
-                // Load education tips
-                const tipsContainer = document.getElementById('education-tips');
-                if (tipsContainer && EDUCATIONAL_CONTENT) {
-                    tipsContainer.innerHTML = EDUCATIONAL_CONTENT.quickTips.map(tip => 
-                        `<div class="tip-card">✅ ${tip}</div>`
-                    ).join('');
-                }
-
-                // Load red flags
-                const redFlagsContainer = document.getElementById('education-redflags');
-                if (redFlagsContainer && EDUCATIONAL_CONTENT) {
-                    redFlagsContainer.innerHTML = EDUCATIONAL_CONTENT.redFlags.map(flag => 
-                        `<div class="warning-card">🚩 ${flag}</div>`
-                    ).join('');
-                }
-
-                // Load resources
-                const resourcesContainer = document.getElementById('education-resources');
-                if (resourcesContainer && EDUCATIONAL_CONTENT) {
-                    resourcesContainer.innerHTML = EDUCATIONAL_CONTENT.reportingResources.map(resource => 
-                        `<div class="card">
-                            <h4><a href="${resource.url}" target="_blank">${resource.name}</a></h4>
-                            <p>${resource.description}</p>
-                        </div>`
-                    ).join('');
-                }
-            }
-
-            loadScamTypesContent() {
-                this.searchScamTypes('');
-            }
-
-            searchScamTypes(query) {
-                const resultsContainer = document.getElementById('scam-types-results');
-                if (!resultsContainer) return;
-
-                const results = searchScamTypes(query);
-                
-                if (results.length === 0) {
-                    resultsContainer.innerHTML = '<p>No scam types found matching your search.</p>';
-                    return;
-                }
-
-                resultsContainer.innerHTML = results.map(scam => `
-                    <div class="card">
-                        <h3>${scam.name}</h3>
-                        <p><strong>Category:</strong> ${scam.category || 'General'}</p>
-                        <p>${scam.description}</p>
-                        <h4>⚠️ Warning Signs:</h4>
-                        <p>${scam.warning_signs}</p>
-                        <h4>💡 Prevention Tips:</h4>
-                        <p>${scam.prevention_tips}</p>
-                        <small>Added: ${scam.created_at ? new Date(scam.created_at).toLocaleDateString() : 'Unknown'}</small>
-                    </div>
-                `).join('');
-            }
-
-            loadRecentAnalyses() {
-                const historyContainer = document.getElementById('analysis-history');
-                if (!historyContainer) return;
-
-                const history = this.analysisHistory.getHistory();
-                
-                if (history.length === 0) {
-                    historyContainer.innerHTML = '<p>No analysis history found. Start by analyzing some content!</p>';
-                    return;
-                }
-
-                historyContainer.innerHTML = history.map(analysis => `
-                    <div class="history-item">
-                        <h4>${(analysis.content_type || 'unknown').toUpperCase()} Analysis</h4>
-                        <p>${this.escapeHtml(analysis.content || 'No content')}</p>
-                        <div class="history-meta">
-                            <span>Risk Level: <strong>${(analysis.risk_level || 'unknown').toUpperCase()}</strong></span> | 
-                            <span>Score: ${analysis.risk_score || 0}/100</span> | 
-                            <span>${analysis.created_at ? new Date(analysis.created_at).toLocaleDateString() : 'Unknown date'}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            loadSectionContent(sectionName) {
-                switch (sectionName) {
-                    case 'education':
-                        this.loadEducationContent();
-                        break;
-                    case 'scam-types':
-                        this.loadScamTypesContent();
-                        break;
-                    case 'history':
-                        this.loadRecentAnalyses();
-                        break;
-                }
-            }
-
             showLoadingState(button) {
                 if (button) {
                     button.disabled = true;
@@ -860,17 +815,14 @@
             }
 
             showAlert(message, type = 'info') {
-                // Create alert element
                 const alert = document.createElement('div');
                 alert.className = `alert alert-${type}`;
                 alert.textContent = message;
                 
-                // Insert at top of current section
                 const currentSection = document.getElementById(`${this.currentSection}-section`);
                 if (currentSection) {
                     currentSection.insertBefore(alert, currentSection.firstChild);
                     
-                    // Auto-remove after 5 seconds
                     setTimeout(() => {
                         if (alert.parentNode) {
                             alert.parentNode.removeChild(alert);
@@ -886,22 +838,12 @@
             }
         }
 
-        // Global functions for buttons
-        function clearAnalysisHistory() {
-            if (confirm('Are you sure you want to clear all analysis history?')) {
-                if (window.scamApp && window.scamApp.analysisHistory) {
-                    window.scamApp.analysisHistory.clearHistory();
-                    window.scamApp.loadRecentAnalyses();
-                    window.scamApp.showAlert('Analysis history cleared successfully!', 'success');
-                }
-            }
-        }
-
-        // Initialize app when DOM is loaded
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initializing Refined Scam Detection App...');
             window.scamApp = new ScamGuardApp();
+            console.log('App initialized successfully!');
         });
     </script>
 </body>
 </html>
-
