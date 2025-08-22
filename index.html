@@ -38,6 +38,11 @@
       padding: 20px;
       border-radius: 8px;
       display: none;
+      word-break: break-word;
+    }
+    #error {
+      color: red;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -46,44 +51,67 @@
 
   <div id="scanner">
     <input type="text" id="urlInput" placeholder="Enter URL to scan..." />
-    <button onclick="scanUrl()">Scan URL</button>
+    <button id="scanButton">Scan URL</button>
+    <div id="error"></div>
   </div>
 
   <div id="results"></div>
 
   <script>
     async function scanUrl() {
-      const url = document.getElementById("urlInput").value;
+      const url = document.getElementById("urlInput").value.trim();
+      const errorDiv = document.getElementById("error");
+      const resultsDiv = document.getElementById("results");
+
+      errorDiv.textContent = "";
+      resultsDiv.style.display = "none";
+      resultsDiv.innerHTML = "";
+
       if (!url) {
-        alert("Please enter a URL");
+        errorDiv.textContent = "Please enter a URL.";
         return;
       }
 
-      const response = await fetch("/scan_url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url })
-      });
+      try {
+        const response = await fetch("/scan_url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
 
-      const data = await response.json();
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.style.display = "block";
+        // Check if response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server did not return JSON");
+        }
 
-      if (data.status === "ok") {
-        resultsDiv.innerHTML = `
-          <h3>Results for: ${data.url}</h3>
-          <p><b>Risk Level:</b> ${data.risk_assessment.level} 
-             (${data.risk_assessment.score}%)</p>
-          <ul>
-            ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join("")}
-          </ul>
-          <small>Analysis time: ${data.timestamp_backend}</small>
-        `;
-      } else {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.message}</p>`;
+        const data = await response.json();
+
+        if (data.status === "ok") {
+          resultsDiv.style.display = "block";
+          resultsDiv.innerHTML = `
+            <h3>Results for: ${data.url}</h3>
+            <p><b>Risk Level:</b> ${data.risk_assessment.level} (${data.risk_assessment.score}%)</p>
+            <ul>
+              ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join("")}
+            </ul>
+            <small>Analysis time: ${data.timestamp_backend}</small>
+          `;
+        } else {
+          errorDiv.textContent = `Error: ${data.message}`;
+        }
+
+      } catch (err) {
+        errorDiv.textContent = `Error fetching scan results: ${err.message}`;
       }
     }
+
+    document.getElementById("scanButton").addEventListener("click", scanUrl);
+
+    // Optional: press Enter to scan
+    document.getElementById("urlInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") scanUrl();
+    });
   </script>
 </body>
 </html>
-
