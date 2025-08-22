@@ -4,46 +4,14 @@
   <meta charset="UTF-8">
   <title>🛡️ Scam Detection App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 20px;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
     h1 { color: #333; }
-    #scanner {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    input[type="text"] {
-      width: 70%;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    #scanner { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    input[type="text"] { width: 70%; padding: 10px; font-size: 16px; }
+    button { padding: 10px 15px; font-size: 16px; background: #007BFF; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background: #0056b3; }
-    #results {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      display: none;
-      word-break: break-word;
-    }
-    #error {
-      color: red;
-      margin-top: 10px;
-    }
+    #results { background: #fff; padding: 20px; border-radius: 8px; display: none; }
+    ul { padding-left: 20px; }
   </style>
 </head>
 <body>
@@ -51,67 +19,55 @@
 
   <div id="scanner">
     <input type="text" id="urlInput" placeholder="Enter URL to scan..." />
-    <button id="scanButton">Scan URL</button>
-    <div id="error"></div>
+    <button id="scanBtn">Scan URL</button>
   </div>
 
   <div id="results"></div>
 
   <script>
-    async function scanUrl() {
-      const url = document.getElementById("urlInput").value.trim();
-      const errorDiv = document.getElementById("error");
-      const resultsDiv = document.getElementById("results");
+    const scanBtn = document.getElementById('scanBtn');
+    const resultsDiv = document.getElementById('results');
 
-      errorDiv.textContent = "";
-      resultsDiv.style.display = "none";
-      resultsDiv.innerHTML = "";
-
+    scanBtn.addEventListener('click', async () => {
+      const url = document.getElementById('urlInput').value.trim();
       if (!url) {
-        errorDiv.textContent = "Please enter a URL.";
+        alert('Please enter a URL');
         return;
       }
 
+      resultsDiv.style.display = 'block';
+      resultsDiv.innerHTML = '<p>Scanning, please wait...</p>';
+
       try {
-        const response = await fetch("/scan_url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/scan_url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url })
         });
 
-        // Check if response is JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Server did not return JSON");
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
         }
 
         const data = await response.json();
 
-        if (data.status === "ok") {
-          resultsDiv.style.display = "block";
+        if (data.status === 'ok') {
           resultsDiv.innerHTML = `
             <h3>Results for: ${data.url}</h3>
             <p><b>Risk Level:</b> ${data.risk_assessment.level} (${data.risk_assessment.score}%)</p>
             <ul>
-              ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join("")}
+              ${data.risk_assessment.factors.map(f => `<li>${f}</li>`).join('')}
             </ul>
             <small>Analysis time: ${data.timestamp_backend}</small>
           `;
         } else {
-          errorDiv.textContent = `Error: ${data.message}`;
+          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.message}</p>`;
         }
-
-      } catch (err) {
-        errorDiv.textContent = `Error fetching scan results: ${err.message}`;
+      } catch (error) {
+        resultsDiv.innerHTML = `<p style="color:red;">Request failed: ${error.message}</p>`;
       }
-    }
-
-    document.getElementById("scanButton").addEventListener("click", scanUrl);
-
-    // Optional: press Enter to scan
-    document.getElementById("urlInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") scanUrl();
     });
   </script>
 </body>
 </html>
+
