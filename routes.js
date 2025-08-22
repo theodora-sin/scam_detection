@@ -1,30 +1,18 @@
-const express = require("express");
-const path = require("path");
+// backend/routes.js
 const { URL } = require("url");
 
-const app = express();
-
-// --- middleware ---
-app.use(express.json());
-
-// serve index.html (and any other static assets if you add a /static directory)
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// --- constants copied from your Python logic ---
+// Scam detection constants
 const SUSPICIOUS_KEYWORDS = ["login", "verify", "secure", "banking", "update"];
 const SUSPICIOUS_TLDS = [".ru", ".tk", ".cn"];
 
-// --- core scan function (same scoring you specified) ---
+// Core scan function
 function basicScan(url) {
   let score = 0;
   const reasons = [];
-
   let parsed;
-  try {
-    parsed = new URL(url);
-  } catch {
+
+  try { parsed = new URL(url); }
+  catch {
     return {
       status: "error",
       message: "Invalid URL format",
@@ -38,29 +26,10 @@ function basicScan(url) {
     };
   }
 
-  if (!url.startsWith("https://")) {
-    score += 20;
-    reasons.push("URL is not HTTPS secured");
-  }
-
-  if (url.length > 100) {
-    score += 15;
-    reasons.push("URL is unusually long");
-  }
-
-  SUSPICIOUS_TLDS.forEach(tld => {
-    if (parsed.hostname.endsWith(tld)) {
-      score += 25;
-      reasons.push(`Suspicious domain ending (${tld})`);
-    }
-  });
-
-  SUSPICIOUS_KEYWORDS.forEach(k => {
-    if (url.toLowerCase().includes(k)) {
-      score += 20;
-      reasons.push(`Contains suspicious keyword: ${k}`);
-    }
-  });
+  if (!url.startsWith("https://")) { score += 20; reasons.push("URL is not HTTPS"); }
+  if (url.length > 100) { score += 15; reasons.push("URL is unusually long"); }
+  SUSPICIOUS_TLDS.forEach(tld => { if (parsed.hostname.endsWith(tld)) { score += 25; reasons.push(`Suspicious TLD: ${tld}`); }});
+  SUSPICIOUS_KEYWORDS.forEach(k => { if (url.toLowerCase().includes(k)) { score += 20; reasons.push(`Contains keyword: ${k}`); }});
 
   score = Math.min(score, 100);
 
@@ -74,45 +43,26 @@ function basicScan(url) {
   return {
     status: "ok",
     url,
-    risk_assessment: {
-      score,
-      level,
-      color,
-      factors: reasons.length ? reasons : ["No obvious scam signs detected"]
-    },
+    risk_assessment: { score, level, color, factors: reasons.length ? reasons : ["No obvious scam signs detected"] },
     timestamp_backend: new Date().toISOString()
   };
 }
 
-// --- routes ---
-app.post("/scan_url", (req, res) => {
-  let url = (req.body?.url || "").trim();
+// Export a function to initialize routes
+function initRoutes(app) {
+  app.post("/scan_url", (req, res) => {
+    let url = (req.body?.url || "").trim();
+    if (!url) return res.status(400).json({ status: "error", message: "No URL provided" });
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    res.json(basicScan(url));
+  });
 
-  if (!url) {
-    return res.status(400).json({ status: "error", message: "No URL provided" });
-  }
+  // Handle non-POST requests
+  app.all("/scan_url", (req, res, next) => {
+    if (req.method !== "POST") return res.status(405).json({ status: "error", message: "Method Not Allowed" });
+    next();
+  });
+}
 
-  if (!/^https?:\/\//i.test(url)) {
-    url = "https://" + url; // default to https if missing
-  }
+module.exports = { initRoutes };
 
-  const result = basicScan(url);
-  res.json(result);
-});
-
-// return clean JSON for wrong methods instead of an HTML error (prevents the "<html>… not valid JSON" error)
-app.all("/scan_url", (req, res, next) => {
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      status: "error",
-      message: "Method Not Allowed. Use POST."
-    });
-  }
-  next();
-});
-
-// --- start ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(` Scam Detection backend running at http://localhost:${PORT}`);
-});
