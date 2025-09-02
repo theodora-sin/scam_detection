@@ -184,13 +184,16 @@
 
 /* Cards */
 .card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
+    background: rgba(24, 24, 32, 0.7);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 2rem;
     margin-bottom: 2rem;
+    transition: box-shadow 0.3s;
 }
-
 .card-header {
     display: flex;
     align-items: center;
