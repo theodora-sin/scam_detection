@@ -109,8 +109,7 @@ class EducationScreen {
                 <p>${scam.prevention_tips}</p>
                 
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
-                    <small><strong>Severity:</strong> ${scam.severity.toUpperCase()} | <strong>Added:</strong> ${scam.created_at ? new Date(scam.created_at).toLocaleDateString() : 'Unknown'}</small>
-                </div>
+                    <small><strong>Severity:</strong> ${scam.severity.toUpperCase()}</small>
             </div>
         `).join('');
     }
