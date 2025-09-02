@@ -1,16 +1,13 @@
-/* UNIVERSAL RESET: Remove all borders, outlines, and backgrounds from all elements and pseudo-elements */
+/* UNIVERSAL RESET: Remove all borders, outlines, and backgrounds from all elements and pseudo-elements, EXCEPT body background */
 *, *::before, *::after {
     border: none !important;
     outline: none !important;
-    background: none !important;
     box-shadow: none !important;
 }
-
-/* Remove table spacing and collapse borders */
-table {
-    border-collapse: collapse !important;
-    border-spacing: 0 !important;
+*:not(body):not(html), *:not(body):not(html)::before, *:not(body):not(html)::after {
+    background: none !important;
 }
+
 /* Scam Detection System Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
