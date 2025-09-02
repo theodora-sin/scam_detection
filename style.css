@@ -63,22 +63,19 @@
   --ring: hsl(180 100% 50%);
 }
 
-@layer base {
-  * {
+* {
     border-color: var(--border);
     border-style: solid;
-  }
-  
-  body {
+}
+
+body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #000000 0%, #111111 50%, #1a1a1a 100%);
     min-height: 100vh;
-  }
 }
 
 @layer components {
@@ -195,6 +192,7 @@
     margin-bottom: 2rem;
     transition: box-shadow 0.3s;
 }
+
 .card-header {
     display: flex;
     align-items: center;
@@ -338,6 +336,7 @@ textarea {
     border-color: var(--success-color);
     color: #b3ffb3;
 }
+
 /* Grid */
 .grid {
     display: grid;
@@ -383,7 +382,7 @@ textarea {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
+        /* background removed */
 /* Alerts */
 .alert {
     padding: 1rem;
@@ -398,57 +397,44 @@ textarea {
     box-shadow: var(--shadow);
 }
 
-.alert-success {
-    background: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724;
-}
 
-.alert-danger {
-    background: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-}
 
 .alert-warning {
-    background: #fff3cd;
-    border-color: #ffeaa7;
-    color: #856404;
+    color: #ffeaa7;
 }
 
 /* Education Content */
 .tip-card {
-    background: #e8f5e8;
-    border-left: 4px solid var(--success-color);
+    /* background removed */
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 5px;
+    color: #d4edda;
 }
 
-.warning-card {
-    background: #fff3cd;
-    border-left: 4px solid var(--warning-color);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-}
+
 
 .scam-type-card {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+    /* background removed */
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1rem;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+        /* background removed */
 }
 
 .history-item {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+    /* background removed */
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+        /* background removed */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .history-item:hover {
@@ -458,7 +444,7 @@ textarea {
 .history-meta {
     font-size: 0.875rem;
     color: #6c757d;
-    margin-top: 0.5rem;
+        /* background removed */
 }
 
 /* Responsive */
@@ -471,7 +457,7 @@ textarea {
         font-size: 0.9rem;
         padding: 0.4rem 0.8rem;
     }
-
+        /* background removed */
     .radio-group {
         flex-direction: column;
     }
@@ -486,6 +472,9 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
+
 
 
 
