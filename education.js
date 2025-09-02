@@ -171,7 +171,6 @@ class EducationScreen {
                 warning_signs: "Urgent language, suspicious sender addresses, requests for personal information, poor grammar/spelling, generic greetings",
                 prevention_tips: "Always verify sender authenticity, check URLs carefully, never provide sensitive information via email, use official websites directly",
                 severity: "high",
-                created_at: new Date('2024-01-15')
             },
             {
                 name: "Tech Support Scam",
@@ -180,7 +179,6 @@ class EducationScreen {
                 warning_signs: "Unsolicited calls about computer problems, requests for remote access, pressure to act immediately, requests for payment",
                 prevention_tips: "Never give remote access to unsolicited callers, verify identity independently, hang up and call official support",
                 severity: "high",
-                created_at: new Date('2024-01-20')
             },
             {
                 name: "Romance Scam",
@@ -189,7 +187,6 @@ class EducationScreen {
                 warning_signs: "Professes love quickly, avoids meeting in person, has emergencies requiring money, limited photos, stories don't add up",
                 prevention_tips: "Be cautious of online relationships, never send money to someone you haven't met, verify identity through video calls",
                 severity: "medium",
-                created_at: new Date('2024-01-25')
             },
             {
                 name: "Investment/Cryptocurrency Scam",
@@ -198,7 +195,6 @@ class EducationScreen {
                 warning_signs: "Guaranteed high returns, pressure to invest quickly, unlicensed sellers, complex fee structures, celebrity endorsements",
                 prevention_tips: "Research investments thoroughly, verify licenses, be skeptical of guaranteed returns, check regulatory warnings",
                 severity: "high",
-                created_at: new Date('2024-02-01')
             },
             {
                 name: "Online Shopping Scam",
@@ -207,7 +203,6 @@ class EducationScreen {
                 warning_signs: "Prices too good to be true, no contact information, poor website design, no customer reviews, payment only by wire transfer",
                 prevention_tips: "Shop from reputable retailers, check reviews and ratings, use secure payment methods with buyer protection",
                 severity: "medium",
-                created_at: new Date('2024-02-05')
             },
             {
                 name: "Social Security Scam",
@@ -216,7 +211,6 @@ class EducationScreen {
                 warning_signs: "Threats of arrest or legal action, demands for immediate payment, requests for Social Security number verification",
                 prevention_tips: "SSA will never call you demanding immediate payment, verify independently by calling official SSA number, never give SSN over phone",
                 severity: "high",
-                created_at: new Date('2024-02-10')
             }
         ];
     }
