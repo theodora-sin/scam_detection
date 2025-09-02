@@ -205,15 +205,13 @@ body {
 
 /* Cards */
 .card {
-    background: rgba(24, 24, 32, 0.7);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    transition: box-shadow 0.3s;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 2rem 0 0 0;
+    margin-bottom: 0;
+    transition: none !important;
 }
 
 .card-header {
@@ -222,10 +220,11 @@ body {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0;
+    border-bottom: none;
+    background: none !important;
+    box-shadow: none !important;
 }
-
 .card-title {
     margin: 0;
     color: var(--dark-text);
@@ -361,17 +360,14 @@ textarea {
 }
 
 /* Grid */
-.grid {
-    display: grid;
-    gap: 2rem;
-}
-
-.grid-2 {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.grid-3 {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+.card {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 2rem 0 0 0;
+    margin-bottom: 0;
+    transition: none !important;
 }
 
 /* Search */
