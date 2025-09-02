@@ -74,9 +74,32 @@ body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, #000000 0%, #111111 50%, #1a1a1a 100%);
+    background: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%);
+    min-height: 100vh;
     min-height: 100vh;
 }
+
+/* Navigation Bar Styles */
+.nav-link {
+    color: #fff;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    margin: 0 0.3rem;
+    background: linear-gradient(90deg, #00fff0 0%, #00bfff 50%, #ff00cc 100%);
+    box-shadow: 0 2px 12px 0 rgba(0,255,255,0.12);
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+    border: 2px solid transparent;
+}
+.nav-link:hover, .nav-link.active {
+    color: #222;
+    background: linear-gradient(90deg, #fff700 0%, #00ffb8 100%);
+    box-shadow: 0 4px 24px 0 rgba(255,255,0,0.18);
+    border: 2px solid #fff700;
+    transform: translateY(-2px) scale(1.05);
+    text-shadow: 0 2px 8px #fff70044;
+}
+
 
 @layer components {
   .ultra-dark-gradient {
