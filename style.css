@@ -1,3 +1,10 @@
+/* Remove all possible grid/container/screen blocks and outlines */
+.container, .grid, .grid-2, .grid-3, .screen {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
 /* Scam Detection System Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -78,11 +85,16 @@ body {
     min-height: 100vh;
 }
 /* Make logo image always visible on any background */
-.logo.png{
-    background: #fff;
+.logo img {
+    background: transparent !important;
     border-radius: 50%;
-    padding: 4px;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+    padding: 0;
+    box-shadow: none !important;
+    width: 60px !important;
+    height: 60px !important;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
 }
 /* Make nav and logo area transparent, no background */
 .nav-container, .logo {
@@ -224,6 +236,8 @@ body {
     padding: 2rem 0 0 0;
     margin-bottom: 0;
     transition: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .card-header {
@@ -233,9 +247,10 @@ body {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 0;
-    border-bottom: none;
+    border-bottom: none !important;
     background: none !important;
     box-shadow: none !important;
+    outline: none !important;
 }
 
 .card-title {
@@ -501,12 +516,6 @@ textarea {
         align-items: flex-start;
     }
 }
-
-
-
-
-
-
 
 
 
