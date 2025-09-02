@@ -493,7 +493,7 @@ textarea {
 }
 
 /* Force nav-link styles to override any previous rules */
-.nav-link {
+nav .nav-link {
     color: #fff !important;
     font-weight: 700 !important;
     padding: 0.7rem 1.4rem !important;
@@ -504,8 +504,9 @@ textarea {
     transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s !important;
     border: 2px solid transparent !important;
     font-size: 1.1rem !important;
+    text-shadow: 0 2px 8px #00fff044 !important;
 }
-.nav-link:hover, .nav-link.active {
+nav .nav-link:hover, nav .nav-link.active {
     color: #222 !important;
     background: linear-gradient(90deg, #fff700 0%, #00ffb8 100%) !important;
     box-shadow: 0 4px 24px 0 rgba(255,255,0,0.22) !important;
@@ -514,7 +515,19 @@ textarea {
     text-shadow: 0 2px 8px #fff70044 !important;
 }
 
-
+textarea {
+    background: rgba(0,0,0,0.5) !important;
+    color: #fff !important;
+    border: 1.5px solid #00fff0 !important;
+    font-size: 1.1rem;
+    transition: border-color 0.3s, background 0.3s;
+}
+textarea:focus {
+    background: rgba(0,0,0,0.7) !important;
+    color: #fff !important;
+    border-color: #fff700 !important;
+    outline: none;
+}
 
 
 
