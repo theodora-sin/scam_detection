@@ -1,9 +1,15 @@
-/* Remove all possible grid/container/screen blocks and outlines */
-.container, .grid, .grid-2, .grid-3, .screen {
-    background: none !important;
+/* UNIVERSAL RESET: Remove all borders, outlines, and backgrounds from all elements and pseudo-elements */
+*, *::before, *::after {
     border: none !important;
-    box-shadow: none !important;
     outline: none !important;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove table spacing and collapse borders */
+table {
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
 }
 /* Scam Detection System Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
