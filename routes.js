@@ -87,8 +87,8 @@ class ScamAnalyzer {
             };
         }
         
-        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-        riskScore += this._checkPatterns(url, this.legitimatePatterns, []);
+    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
@@ -97,8 +97,8 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-        riskScore += this._checkPatterns(emailContent, this.legitimatePatterns, []);
+    riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
     }
@@ -107,8 +107,8 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-        riskScore += this._checkPatterns(message, this.legitimatePatterns, []);
+    riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, message, 'Message');
     }
