@@ -45,7 +45,7 @@ class EducationScreen {
             "Discuss suspicious messages with a trusted person",
             "Never share bank details, names, or financial information on social platforms",
             "Keep software and browsers updated",
-            "Use strong, unique passwords with 2FA"
+            "Use strong, unique passwords with Two Factor Authentication"
         ];
 
         tipsContainer.innerHTML = tips.map(tip => 
