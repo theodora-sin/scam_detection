@@ -1,13 +1,32 @@
 body {
-    background: hsl(0 0% 0%);
-    background-image: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%);
-    background-blend-mode: overlay;
-    color: hsl(0 0% 100%);
+    background: hsl(0 0% 0%) !important;
+    background-image: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%) !important;
+    background-blend-mode: overlay !important;
+    color: #fff !important;
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    width: 100vw;
+    min-width: 100vw;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
+/* Make nav links horizontal and remove list-style */
+.nav-links {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.nav-links li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 /* UNIVERSAL RESET: Remove all borders, outlines, and box-shadows from all elements and pseudo-elements */
 *, *::before, *::after {
     border: none !important;
