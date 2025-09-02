@@ -92,9 +92,16 @@ body {
     box-shadow: none !important;
     width: 60px !important;
     height: 60px !important;
-    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
     display: inline-block;
     vertical-align: middle;
+}
+/* Remove all borders from all elements to eliminate any remaining lines */
+* {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 /* Make nav and logo area transparent, no background */
 .nav-container, .logo {
@@ -516,6 +523,11 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
+
+
+
 
 
 
