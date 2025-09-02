@@ -69,16 +69,28 @@
 }
 
 body {
-    background-color: var(--background);
+    background: var(--background);
+    background-image: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%);
+    background-blend-mode: overlay;
     color: var(--foreground);
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%);
-    min-height: 100vh;
     min-height: 100vh;
 }
-
+/* Make logo image always visible on any background */
+.logo img {
+    background: #fff;
+    border-radius: 50%;
+    padding: 4px;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+}
+/* Make nav and logo area transparent, no background */
+.nav-container, .logo {
+    background: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
 /* Navigation Bar Styles */
 .nav-link {
     color: #fff;
