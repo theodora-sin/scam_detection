@@ -11,17 +11,7 @@ class EducationScreen {
     }
 
     setupEventListeners() {
-        // Search functionality
-        const searchInput = document.getElementById('scam-search');
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    this.searchScamTypes(searchInput.value);
-                }, 300);
-            });
-        }
+        // No search bar, so nothing to set up
     }
 
     loadEducationContent() {
@@ -76,7 +66,28 @@ class EducationScreen {
     }
 
     loadScamTypes() {
-        this.searchScamTypes('');
+        this.renderAllScamTypes();
+    }
+
+    renderAllScamTypes() {
+        // This function should render all scam types without filtering
+        const scamTypesList = document.getElementById('scam-types-list');
+        if (!scamTypesList) return;
+        // Example scam types (replace with your actual data)
+        const scamTypes = [
+            { name: 'Phishing Email', description: 'Fake emails that try to steal your info.' },
+            { name: 'Tech Support Scam', description: 'Scammers pretend to be tech support.' },
+            { name: 'Lottery Scam', description: 'You “win” a lottery you never entered.' },
+            { name: 'Romance Scam', description: 'Fake relationships to steal money.' },
+            { name: 'Investment Scam', description: 'Fake investment opportunities.' },
+            { name: 'Charity Scam', description: 'Fake charities asking for donations.' },
+            { name: 'Impersonation Scam', description: 'Scammers pretend to be someone you know.' },
+            { name: 'Online Shopping Scam', description: 'Fake online stores or products.' },
+            { name: 'Job Offer Scam', description: 'Fake job offers to get your info or money.' },
+        ];
+        scamTypesList.innerHTML = scamTypes.map(type =>
+            `<div class="scam-type-card"><h4>${type.name}</h4><p>${type.description}</p></div>`
+        ).join('');
     }
 
     searchScamTypes(query) {
