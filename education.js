@@ -75,7 +75,7 @@ class EducationScreen {
         if (!scamTypesList) return;
         const scamTypes = this.getScamTypesData();
         scamTypesList.innerHTML = scamTypes.map(type =>
-            `<div class="scam-type-card"><h4>${type.name}</h4><p>${type.description}</p></div>`
+            `<div class="scam-type-card"><h4>${type.name}</h4><p>${type.category}</p><p>${type.warning_signs}</p><p>${type.prevention_tips}</p><p>Severity: ${type.severity.toUpperCase()}</p><p>${type.description}</p><h5>⚠️ Warning Signs:</h5><p>${type.warning_signs}</p><h5>💡 Prevention Tips:</h5><p>${type.prevention_tips}</p><div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;"><small><strong>Severity:</strong> ${type.severity.toUpperCase()}</small></div><p><strong>Description:</strong> ${type.description}</p></div>`
         ).join('');
     }
     searchScamTypes(query) {
