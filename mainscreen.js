@@ -86,28 +86,23 @@ class MainScreen {
                 <h3>📊 Detailed Risk Assessment</h3>
                 <p><strong>Risk Level:</strong> ${(analysis.risk_level || analysis.level || 'unknown').toUpperCase()}</p>
                 <p><strong>Risk Score:</strong> ${analysis.risk_score || analysis.score || 0}/100</p>
-                <p><strong>Analysis ID:</strong> ${analysis.id || 'N/A'}</p>
             </div>
-            
-            <div class="card">
+            <div>
                 <h4>📋 Complete Analysis Report</h4>
                 <p><strong>Content Type:</strong> ${(analysis.content_type || 'unknown').toUpperCase()}</p>
                 <p><strong>Analyzed Content:</strong></p>
-                <div style="background: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                <div style="padding: 1rem; margin: 1rem 0; background: none; border-radius: 0;">
                     <code>${this.app.escapeHtml(analysis.content || 'No content')}</code>
                 </div>
-                
                 ${(analysis.detected_patterns || analysis.factors || []).length > 0 ? `
                     <h5>⚠️ Risk Indicators Found:</h5>
                     <ul>
                         ${(analysis.detected_patterns || analysis.factors || []).map(pattern => `<li>${pattern}</li>`).join('')}
                     </ul>
                 ` : '<p>✅ No specific risk indicators detected.</p>'}
-                
                 <h5>📝 Detailed Analysis Report:</h5>
-                <pre style="white-space: pre-wrap; background: #f8f9fa; padding: 1rem; border-radius: 5px; font-size: 0.9rem;">${analysis.analysis_details || analysis.details || 'No details available'}</pre>
-                
-                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+                <pre style="white-space: pre-wrap; background: none; padding: 1rem; border-radius: 0; font-size: 0.9rem;">${analysis.analysis_details || analysis.details || 'No details available'}</pre>
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; background: none;">
                     <small>📅 Analysis completed: ${analysis.created_at ? new Date(analysis.created_at).toLocaleString() : new Date().toLocaleString()}</small>
                 </div>
             </div>
