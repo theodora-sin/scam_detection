@@ -1,3 +1,20 @@
+/* Also hide the parent .radio-option wrappers for Email and Message in content analysis form */
+#main-screen .radio-option input#analysis-email,
+#main-screen .radio-option input#analysis-message {
+    display: none !important;
+}
+#main-screen .radio-option label[for="analysis-email"],
+#main-screen .radio-option label[for="analysis-message"] {
+    display: none !important;
+}
+#main-screen .radio-option input#analysis-email,
+#main-screen .radio-option input#analysis-message {
+    display: none !important;
+}
+#main-screen .radio-option:has(input#analysis-email),
+#main-screen .radio-option:has(input#analysis-message) {
+    display: none !important;
+}
 /* Hide Email and Message radio buttons in content analysis form */
 #main-screen #analysis-email,
 #main-screen #analysis-message,
