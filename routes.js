@@ -247,22 +247,22 @@ class ScamAnalyzer {
     }
 
 
-    analyzeContent(content, contentType) {
+   analyzeContent(content, contentType) {
         try {
-            if (!content || !contentType) {
-                throw new Error('Content and content type are required');
-            }
+        if (!content || !contentType) {
+            return this._formatResult(0, [], content || '', contentType || 'Unknown');
+        }
 
-            switch (contentType.toLowerCase()) {
-                case 'url':
-                    return this._analyzeUrl(content);
-                case 'email':
-                    return this._analyzeEmail(content);
-                case 'message':
-                    return this._analyzeMessage(content);
-                default:
-                    throw new Error(`Unsupported content type: ${contentType}`);
-            }
+        switch (contentType.toLowerCase()) {
+            case 'url':
+                return this._analyzeUrl(content);
+            case 'email':
+                return this._analyzeEmail(content);
+            case 'message':
+                return this._analyzeMessage(content);
+            default:
+                return this._formatResult(0, [], content, contentType);
+        }
         } catch (error) {
             console.error('Analysis error:', error);
             return {
