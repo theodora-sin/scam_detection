@@ -59,6 +59,12 @@ class StartScreen {
             return;
         }
 
+        // Only allow URL analysis for now
+        if (contentType !== 'url') {
+            this.app.showAlert('Only URL analysis is currently supported.', 'warning');
+            return;
+        }
+
         this.performAnalysis(contentType, content, form, 'quick-results');
     }
 
