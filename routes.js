@@ -1,153 +1,209 @@
-// Enhanced Scam Analyzer with Improved Risk Scoring System
+// Enhanced Scam Analyzer with Comprehensive Pattern Analysis
 class ScamAnalyzer {
     constructor() {
-        // === WEIGHTED PATTERN CATEGORIES ===
-        this.patternWeights = {
-            critical: 1.5,    // Most dangerous patterns (multiplier)
-            high: 1.2,        // High-risk patterns
-            medium: 1.0,      // Standard patterns
-            low: 0.8,         // Lower-risk patterns
-            informational: 0.5 // Just informational
-        };
-
-        // === IMPROVED URL PATTERNS WITH WEIGHTED SCORING ===
+        // === EXPANDED URL PATTERNS ===
         this.urlPatterns = [
-            // CRITICAL THREATS (High multiplier)
-            { pattern: /\.(exe|scr|bat|com|pif|vbs|jar|zip|rar)(\?|$)/i, description: 'Executable file in URL (CRITICAL)', score: 80, weight: 'critical' },
-            { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'Raw IP address instead of domain', score: 60, weight: 'critical' },
-            { pattern: /xn--/i, description: 'Punycode URL (homograph attack)', score: 70, weight: 'critical' },
+            // Shortened URLs and URL shorteners
+            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|short\.link|is\.gd|buff\.ly|rebrand\.ly|cutt\.ly|tiny\.cc/i, description: 'Shortened URL service', score: 30 },
             
-            // HIGH RISK PATTERNS
-            { pattern: /(payp[a4]l|[a4]m[a4]zon|micr0s0ft|[a4]pple|g[o0]{2}gle|f[a4]ceb[o0]{2}k|tw[i1]tter).*\.(com|net|org)/i, description: 'Brand typosquatting detected', score: 65, weight: 'high' },
-            { pattern: /(bank|secure|login|account|verify|update|confirm).*-.*\.(com|net|org|biz)/i, description: 'Suspicious domain with security keywords', score: 55, weight: 'high' },
-            { pattern: /[a-z0-9]{12,}\.(tk|ml|ga|cf|xyz|click)/i, description: 'Long random domain on suspicious TLD', score: 50, weight: 'high' },
+            // IP addresses instead of domains
+            { pattern: /https?:\/\/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 45 },
             
-            // MEDIUM RISK PATTERNS
-            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|short\.link|is\.gd|buff\.ly|rebrand\.ly|cutt\.ly|tiny\.cc/i, description: 'URL shortening service', score: 35, weight: 'medium' },
-            { pattern: /\.(tk|ml|ga|cf|xyz|click|download|bid|country|loan|win|review|racing|accountant)/i, description: 'Suspicious or free domain TLD', score: 40, weight: 'medium' },
-            { pattern: /(secure|login|account|verify|update|confirm)\.[a-z0-9-]+\.(com|net)/i, description: 'Security-themed suspicious subdomain', score: 45, weight: 'medium' },
-            { pattern: /:[0-9]{1,5}\//, description: 'Non-standard port number', score: 30, weight: 'medium' },
+            // Suspicious domain mimicking (typosquatting)
+            { pattern: /(payp[a4]l|[a4]m[a4]zon|micr0s0ft|[a4]pple|g[o0]{2}gle|f[a4]ceb[o0]{2}k|tw[i1]tter).*\.(com|net|org)/i, description: 'Typosquatting - mimicking legitimate brand', score: 60 },
+            { pattern: /(bank|secure|login|account|verify|update|confirm).*-.*\.(com|net|org|biz)/i, description: 'Suspicious domain with security keywords', score: 50 },
             
-            // LOW RISK PATTERNS
-            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Unusual subdomain pattern', score: 25, weight: 'low' },
-            { pattern: /\/+[a-z0-9]{15,}/i, description: 'Long random URL path', score: 20, weight: 'low' },
-            { pattern: /redirect|redir|goto|link|click|ref/i, description: 'URL redirection indicators', score: 20, weight: 'low' },
+            // Free/suspicious hosting domains
+            { pattern: /\.(tk|ml|ga|cf|xyz|click|download|bid|country|loan|win|review|racing|accountant)/i, description: 'Free or suspicious domain hosting', score: 40 },
+            { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf|xyz|click)/i, description: 'Long random domain on suspicious TLD', score: 50 },
             
-            // INFORMATIONAL
-            { pattern: /(%[0-9a-f]{2}){2,}/i, description: 'URL encoding detected', score: 15, weight: 'informational' },
-            { pattern: /\?[a-z0-9]{10,}/i, description: 'Long query parameters', score: 15, weight: 'informational' }
+            // Suspicious subdomains
+            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 30 },
+            { pattern: /(secure|login|account|verify|update|confirm)\.[a-z0-9-]+\.(com|net)/i, description: 'Security-themed suspicious subdomain', score: 45 },
+            { pattern: /[a-z0-9]{10,}\.(com|net|org)/i, description: 'Very long domain name (often random)', score: 35 },
+            
+            // Punycode and internationalized domains
+            { pattern: /xn--/i, description: 'Punycode URL (potential homograph attack)', score: 55 },
+            
+            // Suspicious URL structures
+            { pattern: /\/+[a-z0-9]{20,}/i, description: 'Suspicious long random path', score: 25 },
+            { pattern: /\?[a-z0-9]{15,}/i, description: 'Suspicious long query parameter', score: 20 },
+            { pattern: /redirect|redir|goto|link|click|ref/i, description: 'URL redirection patterns', score: 25 },
+            
+            // Port numbers (unusual for normal websites)
+            { pattern: /:[0-9]{1,5}\//, description: 'Non-standard port number', score: 30 },
+            
+            // Suspicious file extensions in URLs
+            { pattern: /\.(exe|scr|bat|com|pif|vbs|jar|zip|rar)(\?|$)/i, description: 'Suspicious file extension in URL', score: 70 },
+            
+            // URL encoding abuse
+            { pattern: /(%[0-9a-f]{2}){3,}/i, description: 'Excessive URL encoding (potential obfuscation)', score: 35 }
         ];
 
-        // === IMPROVED EMAIL PATTERNS WITH WEIGHTED SCORING ===
+        // === EXPANDED EMAIL PATTERNS ===
         this.emailPatterns = [
-            // CRITICAL THREATS
-            { pattern: /virus.*detected|malware.*found|computer.*infected|system.*compromised/i, description: 'Fake malware alert (CRITICAL)', score: 75, weight: 'critical' },
-            { pattern: /embarrassing.*video|intimate.*photos|webcam.*recording|blackmail|extortion/i, description: 'Blackmail/extortion attempt (CRITICAL)', score: 85, weight: 'critical' },
-            { pattern: /(open|view|download|execute) (attachment|document|file|invoice|receipt).*urgently?/i, description: 'Urgent malicious attachment request', score: 70, weight: 'critical' },
+            // Urgency and pressure tactics
+            { pattern: /urgent|immediate|act now|limited time|expires today|final notice|last chance|time[\s-]?sensitive|deadline/i, description: 'Urgency and pressure tactics', score: 35 },
+            { pattern: /within \d+ hours?|in \d+ minutes?|expires? (today|tomorrow|soon)/i, description: 'Time pressure with specific deadlines', score: 40 },
             
-            // HIGH RISK PATTERNS
-            { pattern: /suspended.*account|expired.*session|re.?activate.*now|re.?verify.*immediately/i, description: 'Account suspension phishing', score: 60, weight: 'high' },
-            { pattern: /wire transfer|western union|moneygram|bitcoin|cryptocurrency|gift cards?|prepaid cards?/i, description: 'Unusual payment methods', score: 55, weight: 'high' },
-            { pattern: /(million|thousand) (dollars?|euros?|pounds?)|inheritance.*\$.*million/i, description: 'Unrealistic large money claims', score: 65, weight: 'high' },
-            { pattern: /(paypal|amazon|microsoft|apple|google|facebook|twitter|instagram).*security.*alert/i, description: 'Major service impersonation', score: 60, weight: 'high' },
-            { pattern: /processing fee|handling fee|tax payment|transfer fee|activation fee/i, description: 'Advance fee fraud language', score: 55, weight: 'high' },
+            // Account security threats
+            { pattern: /verify your account|suspend|locked|frozen|blocked|deactivated|compromised|breach/i, description: 'Account threat language', score: 40 },
+            { pattern: /unauthorized (access|login|activity)|suspicious (activity|login)|security alert/i, description: 'Fake security warnings', score: 45 },
+            { pattern: /confirm your (identity|personal|account|payment)/i, description: 'Identity confirmation requests', score: 35 },
             
-            // MEDIUM RISK PATTERNS
-            { pattern: /urgent|immediate|act now|limited time|expires today|final notice|last chance/i, description: 'Urgency pressure tactics', score: 35, weight: 'medium' },
-            { pattern: /verify your account|locked|frozen|blocked|deactivated|compromised/i, description: 'Account threat language', score: 40, weight: 'medium' },
-            { pattern: /congratulations|winner|you.?(won|win)|lottery|jackpot|prize|reward/i, description: 'Prize/lottery scam language', score: 40, weight: 'medium' },
-            { pattern: /click here|download now|claim your (prize|reward|money)|update (now|immediately)/i, description: 'Suspicious call-to-action', score: 35, weight: 'medium' },
-            { pattern: /investment opportunity|guaranteed return|profit margin|roi|passive income/i, description: 'Investment scam language', score: 45, weight: 'medium' },
+            // Suspicious call-to-action
+            { pattern: /click here|download now|claim your (prize|reward|money)|update (now|immediately)/i, description: 'Suspicious call-to-action phrases', score: 30 },
+            { pattern: /(open|view|download) (attachment|document|file|invoice|receipt)/i, description: 'Malicious attachment requests', score: 45 },
             
-            // LOW RISK PATTERNS
-            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz|click|download)/i, description: 'Email from suspicious domain', score: 30, weight: 'low' },
-            { pattern: /dear (customer|sir|madam|friend|beneficiary)/i, description: 'Generic impersonal greeting', score: 20, weight: 'low' },
-            { pattern: /(\$|€|£|¥)\s*\d{3,}/, description: 'Money amounts mentioned', score: 25, weight: 'low' },
+            // Prize/lottery scam language
+            { pattern: /congratulations|winner|you.?(won|win)|lottery|jackpot|prize|reward|cash.?prize/i, description: 'Prize and lottery scam language', score: 40 },
+            { pattern: /(million|thousand) (dollars?|euros?|pounds?)|inheritance.*million/i, description: 'Large money prize claims', score: 50 },
             
-            // INFORMATIONAL
-            { pattern: /[A-Z]{4,}\s+[A-Z]{4,}\s+[A-Z]{4,}/, description: 'Excessive capitalization', score: 15, weight: 'informational' },
-            { pattern: /!!!+|!!!.*!!!|\?\?\?+/i, description: 'Excessive punctuation', score: 10, weight: 'informational' }
+            // Payment and financial scams
+            { pattern: /wire transfer|western union|moneygram|bitcoin|cryptocurrency|gift cards?|prepaid cards?/i, description: 'Unusual payment methods', score: 45 },
+            { pattern: /processing fee|handling fee|tax payment|transfer fee|activation fee/i, description: 'Advance fee fraud language', score: 50 },
+            { pattern: /refund|reimbursement|compensation.*available/i, description: 'Fake refund offers', score: 30 },
+            
+            // Generic/impersonal greetings
+            { pattern: /dear (customer|sir|madam|friend|beneficiary|winner)/i, description: 'Generic impersonal greeting', score: 20 },
+            { pattern: /dear valued (customer|client|member)/i, description: 'Generic valued customer greeting', score: 25 },
+            
+            // Poor grammar indicators
+            { pattern: /[A-Z]{4,}\s+[A-Z]{4,}\s+[A-Z]{4,}/, description: 'Excessive capitalization', score: 15 },
+            { pattern: /!!!+|!!!.*!!!|\?\?\?+/i, description: 'Excessive punctuation', score: 20 },
+            
+            // Money amounts
+            { pattern: /(\$|€|£|¥)\s*\d{4,}/, description: 'Large money amounts mentioned', score: 25 },
+            { pattern: /\d+\s*(million|billion)\s*(dollars?|euros?|pounds?)/i, description: 'Unrealistic large sums', score: 40 },
+            
+            // Suspicious sender domains
+            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz|click|download)/i, description: 'Email from suspicious domain', score: 40 },
+            { pattern: /@(temporary|temp|disposable|guerrilla|10minute)/i, description: 'Temporary email service', score: 35 },
+            
+            // Authority impersonation
+            { pattern: /(paypal|amazon|microsoft|apple|google|facebook|twitter|instagram).*security/i, description: 'Impersonating major service security', score: 55 },
+            { pattern: /(bank|irs|government|federal|tax|court|legal)/i, description: 'Government/authority impersonation', score: 50 },
+            
+            // Romance/relationship scams
+            { pattern: /lonely|alone|widow|widower|military|deployed|overseas|soldier/i, description: 'Romance scam profile language', score: 30 },
+            { pattern: /god.?fearing|honest|trustworthy|genuine|sincere.*person/i, description: 'Romance scam personality claims', score: 25 },
+            
+            // Investment scams
+            { pattern: /investment opportunity|guaranteed return|profit margin|roi|passive income/i, description: 'Investment scam language', score: 40 },
+            { pattern: /forex|binary options|crypto.?trading|mining.?investment/i, description: 'High-risk investment types', score: 45 },
+            
+            // Phishing attempts
+            { pattern: /suspended.*account|expired.*session|re.?activate|re.?verify/i, description: 'Account suspension phishing', score: 45 },
+            { pattern: /update.*payment.*method|billing.*information.*required/i, description: 'Payment information phishing', score: 50 },
+            
+            // Malware/virus warnings
+            { pattern: /virus.*detected|malware.*found|computer.*infected|system.*compromised/i, description: 'Fake virus/malware warnings', score: 55 },
+            
+            // Fake delivery/shipping
+            { pattern: /(ups|fedex|dhl|usps).*delivery.*failed|package.*waiting|shipment.*held/i, description: 'Fake shipping notifications', score: 40 }
         ];
 
-        // === IMPROVED MESSAGE PATTERNS WITH WEIGHTED SCORING ===
+        // === EXPANDED MESSAGE PATTERNS ===
         this.messagePatterns = [
-            // CRITICAL THREATS
-            { pattern: /remote.*access|teamviewer|anydesk|logmein|screen.*share|download.*software/i, description: 'Remote access scam (CRITICAL)', score: 80, weight: 'critical' },
-            { pattern: /arrest.*warrant|legal.*action.*pending|court.*summons|jail.*time/i, description: 'Legal threat scam (CRITICAL)', score: 75, weight: 'critical' },
-            { pattern: /social.*security.*suspended|ssn.*compromised|government.*investigation/i, description: 'SSN/Government threat scam', score: 70, weight: 'critical' },
+            // Romance scam indicators
+            { pattern: /love|heart|soul.?mate|marry|marriage|relationship|affection|care.*you/i, description: 'Romance scam emotional language', score: 30 },
+            { pattern: /widow|widower|military|soldier|deployed|overseas|doctor|engineer.*abroad/i, description: 'Romance scam profession claims', score: 35 },
+            { pattern: /god.?fearing|christian|honest|trustworthy|genuine.*person/i, description: 'Romance scam character claims', score: 25 },
             
-            // HIGH RISK PATTERNS
-            { pattern: /tech.*support|computer.*problem|virus.*detected|microsoft.*calling|apple.*support/i, description: 'Tech support scam', score: 55, weight: 'high' },
-            { pattern: /forex|binary.*options|crypto.?trading|bitcoin.*investment|mining.*contract/i, description: 'High-risk investment schemes', score: 50, weight: 'high' },
-            { pattern: /federal.*agency|homeland.*security|fbi|police.*department|irs.*agent/i, description: 'Law enforcement impersonation', score: 65, weight: 'high' },
-            { pattern: /inheritance|will|estate|beneficiary|deceased.*relative|attorney.*contact/i, description: 'Inheritance fraud', score: 50, weight: 'high' },
-            { pattern: /personal.*assistant|money.*transfer.*agent|payment.*processor.*job/i, description: 'Money laundering recruitment', score: 60, weight: 'high' },
+            // Investment/financial scams
+            { pattern: /investment|profit|return|guarantee|double.*money|roi|passive.*income/i, description: 'Investment scam language', score: 35 },
+            { pattern: /forex|binary.*options|crypto.?trading|bitcoin.*investment|mining/i, description: 'High-risk investment schemes', score: 40 },
+            { pattern: /financial.*freedom|make.*money.*home|work.*from.*home/i, description: 'Get-rich-quick schemes', score: 30 },
             
-            // MEDIUM RISK PATTERNS
-            { pattern: /love|heart|soul.?mate|marry|marriage|relationship.*serious/i, description: 'Romance scam language', score: 35, weight: 'medium' },
-            { pattern: /investment|profit.*guaranteed|double.*money|financial.*freedom/i, description: 'Investment scam tactics', score: 40, weight: 'medium' },
-            { pattern: /emergency|hospital|accident|stranded.*need.*help|urgent.*help/i, description: 'Emergency assistance scam', score: 35, weight: 'medium' },
-            { pattern: /won.*lottery|lottery.*winner|cash.*prize|sweepstakes.*winner/i, description: 'Lottery scam claims', score: 40, weight: 'medium' },
-            { pattern: /charity|donation|disaster.*relief|children.*need.*help/i, description: 'Charity scam appeals', score: 30, weight: 'medium' },
+            // Tech support scams
+            { pattern: /tech.*support|computer.*problem|virus|infected|microsoft.*calling|apple.*support/i, description: 'Tech support scam', score: 40 },
+            { pattern: /remote.*access|teamviewer|anydesk|logmein|screen.*share/i, description: 'Remote access requests', score: 55 },
+            { pattern: /windows.*license|software.*expired|antivirus.*expired/i, description: 'Fake software expiration', score: 45 },
             
-            // LOW RISK PATTERNS
-            { pattern: /(whatsapp|telegram|signal).*chat|move.*conversation.*to/i, description: 'Communication platform switch', score: 25, weight: 'low' },
-            { pattern: /work.*from.*home|easy.*money|no.*experience.*required/i, description: 'Employment scam indicators', score: 20, weight: 'low' },
-            { pattern: /widow|widower|military|soldier|deployed|overseas/i, description: 'Romance scam professions', score: 25, weight: 'low' },
+            // Government impersonation
+            { pattern: /social.*security|ssn|government|irs|tax.*refund|arrest.*warrant|court|legal.*action/i, description: 'Government authority impersonation', score: 50 },
+            { pattern: /federal.*agency|homeland.*security|fbi|police.*department/i, description: 'Law enforcement impersonation', score: 55 },
+            { pattern: /immigration|visa|deportation|citizenship/i, description: 'Immigration scam language', score: 40 },
             
-            // INFORMATIONAL
-            { pattern: /god.*bless|prayers|blessed|trust.*in.*god/i, description: 'Religious manipulation', score: 15, weight: 'informational' }
+            // Emergency/help scams
+            { pattern: /emergency|hospital|accident|stranded|help.*me|urgent.*help|trouble/i, description: 'Emergency assistance scam tactics', score: 35 },
+            { pattern: /medical.*emergency|surgery|treatment|medication.*money/i, description: 'Medical emergency scams', score: 40 },
+            
+            // Inheritance/advance fee scams
+            { pattern: /inheritance|will|estate|beneficiary|deceased|attorney|lawyer|legal.*representative/i, description: 'Inheritance scam language', score: 40 },
+            { pattern: /transfer.*money|move.*funds|processing.*fee|handling.*fee|tax.*payment/i, description: 'Advance fee fraud language', score: 45 },
+            { pattern: /diplomatic.*bag|consignment|security.*company|courier.*service/i, description: 'Fake delivery/transfer methods', score: 50 },
+            
+            // Communication platform abuse
+            { pattern: /(whatsapp|telegram|signal|viber|skype).*chat|move.*to.*(whatsapp|telegram)/i, description: 'Suspicious communication platform requests', score: 25 },
+            { pattern: /google.*hangouts|gmail.*chat|yahoo.*messenger/i, description: 'Communication platform targeting', score: 20 },
+            
+            // Prize/lottery scams
+            { pattern: /won.*lottery|lottery.*winner|jackpot|cash.*prize|sweepstakes/i, description: 'Lottery and prize scam claims', score: 45 },
+            { pattern: /claim.*prize|collection.*agent|prize.*money|winning.*number/i, description: 'Prize claiming instructions', score: 40 },
+            
+            // Charity/disaster scams
+            { pattern: /charity|donation|disaster.*relief|hurricane|earthquake|flood.*victims/i, description: 'Charity and disaster scam appeals', score: 35 },
+            { pattern: /orphanage|children.*need|medical.*help.*children/i, description: 'Fake charity emotional appeals', score: 40 },
+            
+            // Job/employment scams
+            { pattern: /job.*offer|employment.*opportunity|work.*from.*home|easy.*money/i, description: 'Job scam language', score: 25 },
+            { pattern: /personal.*assistant|money.*transfer.*agent|payment.*processor/i, description: 'Money laundering job offers', score: 50 },
+            
+            // Rental/real estate scams
+            { pattern: /apartment.*rent|house.*rent|property.*available|landlord/i, description: 'Rental scam language', score: 20 },
+            { pattern: /security.*deposit|first.*month.*rent|key.*money|viewing.*fee/i, description: 'Rental advance fee requests', score: 35 },
+            
+            // Fake product/medication sales
+            { pattern: /weight.*loss|male.*enhancement|miracle.*cure|no.*prescription|pharmacy/i, description: 'Fake medication/product sales', score: 40 },
+            
+            // Blackmail/extortion
+            { pattern: /embarrassing.*video|intimate.*photos|webcam|blackmail|extortion|expose/i, description: 'Blackmail and sextortion', score: 60 },
+            
+            // Cryptocurrency scams
+            { pattern: /bitcoin.*wallet|crypto.*investment|blockchain|nft.*opportunity|defi/i, description: 'Cryptocurrency scam language', score: 35 },
+            { pattern: /mining.*contract|trading.*bot|guaranteed.*profit.*crypto/i, description: 'Crypto investment scams', score: 45 }
         ];
 
-        // === PHONE NUMBER PATTERNS ===
-        this.phonePatterns = [
-            // CRITICAL
-            { pattern: /^\+?(234|233|229|225|237|254)/, description: 'High-risk country code (West/East Africa)', score: 70, weight: 'critical' },
-            
-            // HIGH RISK
-            { pattern: /^\+?1-?8(00|33|44|55|66|77|88|99)/, description: 'Common scam toll-free pattern', score: 50, weight: 'high' },
-            { pattern: /^\+?(375|380|996|998)/, description: 'High-risk country codes (Eastern Europe)', score: 55, weight: 'high' },
-            
-            // MEDIUM RISK
-            { pattern: /^\+?1-?[0-9]{3}-?000-?[0-9]{4}/, description: 'Suspicious number format', score: 35, weight: 'medium' },
-            { pattern: /^(\+?1)?(555|888|777|666|999)/, description: 'Suspicious area codes', score: 30, weight: 'medium' }
-        ];
-
-        // === ENHANCED LEGITIMATE PATTERNS ===
+        // === EXPANDED LEGITIMATE PATTERNS (Reduce false positives) ===
         this.legitimatePatterns = [
-            // Strong legitimacy indicators
-            { pattern: /https:\/\/.*\.gov(\.[a-z]{2})?\//, description: 'Official government domain', score: -40, weight: 'critical' },
-            { pattern: /https:\/\/(www\.)?(google|microsoft|apple|amazon|paypal|facebook|twitter|linkedin|github)\.com/i, description: 'Major legitimate service', score: -35, weight: 'high' },
-            { pattern: /gdpr|ccpa|data.*protection|privacy.*policy.*compliant/i, description: 'Privacy regulation compliance', score: -30, weight: 'high' },
+            // Official government domains
+            { pattern: /https:\/\/.*\.gov(\.[a-z]{2})?\//, description: 'Official government website', score: -30 },
+            { pattern: /https:\/\/.*\.(edu|ac\.[a-z]{2})\//, description: 'Educational institution domain', score: -20 },
             
-            // Medium legitimacy indicators  
-            { pattern: /https:\/\/.*\.(edu|ac\.[a-z]{2})\//, description: 'Educational institution', score: -25, weight: 'medium' },
-            { pattern: /unsubscribe|opt.?out|manage.*preferences/i, description: 'Legitimate opt-out options', score: -20, weight: 'medium' },
-            { pattern: /customer.*service|help.*center|support.*team/i, description: 'Professional support language', score: -15, weight: 'medium' },
+            // Legitimate organizations
+            { pattern: /https:\/\/.*\.(org|ngo)\//, description: 'Non-profit organization domain', score: -15 },
             
-            // Light legitimacy indicators
-            { pattern: /best.*regards|sincerely|kind.*regards|yours.*truly/i, description: 'Professional email closing', score: -10, weight: 'low' },
-            { pattern: /invoice|receipt|order.*confirmation|shipping.*notification/i, description: 'Business communication', score: -10, weight: 'low' }
+            // Customer service language
+            { pattern: /customer.*service|help.*center|support.*team|contact.*us|faq|frequently.*asked/i, description: 'Legitimate customer service language', score: -10 },
+            
+            // Legal/compliance elements
+            { pattern: /privacy.*policy|terms.*of.*service|terms.*and.*conditions|unsubscribe|opt.?out/i, description: 'Legitimate legal/compliance elements', score: -15 },
+            { pattern: /gdpr|ccpa|data.*protection|cookie.*policy/i, description: 'Privacy regulation compliance', score: -20 },
+            
+            // Legitimate business communication
+            { pattern: /invoice|receipt|order.*confirmation|shipping.*notification|delivery.*update/i, description: 'Legitimate business communication', score: -10 },
+            
+            // Official branded domains (major services)
+            { pattern: /https:\/\/(www\.)?(google|microsoft|apple|amazon|paypal|facebook|twitter|linkedin|github|stackoverflow)\.com/i, description: 'Legitimate major service domain', score: -25 },
+            { pattern: /https:\/\/(mail|outlook|gmail|yahoo)\./, description: 'Legitimate email service', score: -15 },
+            
+            // Professional email signatures
+            { pattern: /best.*regards|sincerely|kind.*regards|yours.*truly/i, description: 'Professional email closing', score: -5 },
+            { pattern: /phone:.*[0-9]|tel:.*[0-9]|office:.*[0-9]/i, description: 'Contact information provided', score: -10 },
+            
+            // Legitimate financial terms
+            { pattern: /bank.*statement|account.*balance|transaction.*history|monthly.*statement/i, description: 'Legitimate banking communication', score: -10 },
+            
+            // SSL/Security indicators (when mentioned appropriately)
+            { pattern: /secure.*connection|ssl.*certificate|encrypted.*communication/i, description: 'Security awareness language', score: -5 }
         ];
 
-        // === CONTEXTUAL SCORING FACTORS ===
-        this.contextFactors = {
-            // Content length analysis
-            tooShort: { threshold: 10, score: 20, description: 'Suspiciously short content' },
-            tooLong: { threshold: 2000, score: 15, description: 'Excessively long content' },
-            
-            // Pattern density
-            highDensity: { threshold: 0.1, score: 25, description: 'High suspicious pattern density' },
-            
-            // Character analysis
-            nonAscii: { threshold: 0.3, score: 30, description: 'High non-ASCII character ratio' },
-            mixedScripts: { score: 40, description: 'Mixed character scripts detected' }
-        };
-
-        // Enhanced common words dictionary
+        // Enhanced common words dictionary (expanded significantly)
         this.commonWords = new Set([
-            'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not', 'on',
-            'with', 'he', 'as', 'you', 'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we',
+            // Basic common words
+            'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not', 'on', 
+            'with', 'he', 'as', 'you', 'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we', 
             'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their',
             'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me', 'when',
             'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take', 'people', 'into',
@@ -155,376 +211,172 @@ class ScamAnalyzer {
             'look', 'only', 'come', 'its', 'over', 'think', 'also', 'back', 'after', 'use', 'two',
             'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any',
             'these', 'give', 'day', 'most', 'us', 'is', 'water', 'been', 'call', 'who', 'oil', 'sit',
-            // Extended common words
-            'email', 'message', 'website', 'internet', 'computer', 'phone', 'account', 'password',
-            'service', 'customer', 'support', 'help', 'contact', 'information', 'please', 'thank',
-            'hello', 'dear', 'regards', 'sincerely', 'best', 'business', 'company', 'order', 'payment'
+            'now', 'find', 'long', 'down', 'day', 'did', 'get', 'has', 'him', 'had', 'let', 'put', 'say',
+            'too', 'old', 'why', 'how', 'its', 'our', 'out', 'two', 'way', 'who', 'boy', 'did', 'man',
+            'new', 'now', 'old', 'see', 'got', 'may', 'try', 'ask', 'end', 'big', 'far', 'sea', 'eye',
+            
+            // Extended vocabulary
+            'email', 'message', 'website', 'internet', 'computer', 'phone', 'account', 'password', 'user',
+            'service', 'customer', 'support', 'help', 'contact', 'information', 'please', 'thank', 'thanks',
+            'hello', 'dear', 'regards', 'sincerely', 'best', 'kind', 'today', 'tomorrow', 'yesterday',
+            'morning', 'afternoon', 'evening', 'night', 'week', 'month', 'year', 'business', 'company',
+            'order', 'payment', 'money', 'price', 'cost', 'free', 'offer', 'sale', 'buy', 'sell',
+            'product', 'item', 'delivery', 'shipping', 'send', 'receive', 'address', 'name', 'number',
+            'date', 'time', 'welcome', 'congrats', 'sorry', 'excuse', 'problem', 'issue', 'question',
+            'answer', 'reply', 'response', 'confirm', 'cancel', 'update', 'change', 'delete', 'remove'
         ]);
 
-        // Risk level thresholds (adjusted for better distribution)
-        this.riskThresholds = {
-            high: 65,    // Raised from 60
-            medium: 35,  // Raised from 30
-            low: 0
-        };
+        // Suspicious file extensions (expanded)
+        this.suspiciousExtensions = new Set([
+            'exe', 'scr', 'bat', 'cmd', 'com', 'pif', 'vbs', 'js', 'jar', 'wsf', 'wsh', 'ps1',
+            'msi', 'hta', 'cpl', 'msc', 'reg', 'scf', 'lnk', 'inf', 'dll'
+        ]);
+
+        // Known scam domains and patterns (regularly updated list)
+        this.knownScamDomains = new Set([
+            'bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'ow.ly', 'short.link', 'is.gd',
+            'buff.ly', 'rebrand.ly', 'cutt.ly', 'tiny.cc'
+        ]);
+
+        // Suspicious TLDs (expanded)
+        this.suspiciousTlds = new Set([
+            'tk', 'ml', 'ga', 'cf', 'xyz', 'click', 'download', 'bid', 'country', 'loan',
+            'win', 'review', 'racing', 'accountant', 'faith', 'cricket', 'science', 'work',
+            'party', 'gq', 'men', 'ren'
+        ]);
     }
 
-    // Clamp the risk score between 0 and 100
-    _calculateFinalScore(baseScore, detectedPatterns) {
-        if (typeof baseScore !== 'number' || isNaN(baseScore)) return 0;
-        return Math.max(0, Math.min(100, Math.round(baseScore)));
-    }
+
     analyzeContent(content, contentType) {
         try {
             if (!content || !contentType) {
                 throw new Error('Content and content type are required');
             }
 
-            let baseScore = 0;
-            const detectedPatterns = [];
-            const analysisDetails = [];
-
-            // Phase 1: Pattern Matching with Weights
-            const patternResult = this._analyzePatterns(content, contentType, detectedPatterns);
-            baseScore += patternResult.score;
-            analysisDetails.push(...patternResult.details);
-
-            // Phase 2: Contextual Analysis
-            const contextResult = this._analyzeContext(content, contentType, detectedPatterns);
-            baseScore += contextResult.score;
-            analysisDetails.push(...contextResult.details);
-
-            // Phase 3: Text Quality Analysis
-            const qualityResult = this._analyzeTextQuality(content, detectedPatterns);
-            baseScore += qualityResult.score;
-            analysisDetails.push(...qualityResult.details);
-
-            // Phase 4: Content-Specific Analysis
-            const specificResult = this._analyzeContentSpecific(content, contentType, detectedPatterns);
-            baseScore += specificResult.score;
-            analysisDetails.push(...specificResult.details);
-
-            // Phase 5: Legitimate Pattern Reduction
-            const legitimateResult = this._analyzeLegitimatePatterns(content, detectedPatterns);
-            baseScore += legitimateResult.score; // This will be negative
-            analysisDetails.push(...legitimateResult.details);
-
-            // Final Score Calculation
-            const finalScore = this._calculateFinalScore(baseScore, detectedPatterns);
-            const riskLevel = this._calculateRiskLevel(finalScore);
-
-            return {
-                level: riskLevel,
-                score: finalScore,
-                factors: detectedPatterns,
-                details: this._generateDetailedReport(contentType, finalScore, riskLevel, detectedPatterns, analysisDetails),
-                recommendations: this._generateRecommendations(riskLevel, contentType, detectedPatterns),
-                timestamp: new Date().toISOString(),
-                analysisPhases: {
-                    patternScore: patternResult.score,
-                    contextScore: contextResult.score,
-                    qualityScore: qualityResult.score,
-                    specificScore: specificResult.score,
-                    legitimateScore: legitimateResult.score,
-                    finalScore: finalScore
-                }
-            };
-
+            switch (contentType.toLowerCase()) {
+                case 'url':
+                    return this._analyzeUrl(content);
+                case 'email':
+                    return this._analyzeEmail(content);
+                case 'message':
+                    return this._analyzeMessage(content);
+                default:
+                    throw new Error(`Unsupported content type: ${contentType}`);
+            }
         } catch (error) {
             console.error('Analysis error:', error);
             return {
                 level: 'unknown',
                 score: 0,
-                factors: ['Analysis error occurred'],
-                details: `Error: ${error.message}`,
-                recommendations: ['Please try again with valid content'],
+                factors: [],
+                details: `Error during analysis: ${error.message}`,
                 timestamp: new Date().toISOString()
             };
         }
     }
 
-    _analyzePatterns(content, contentType, detectedPatterns) {
-        let score = 0;
-        const details = [];
-        let patterns = [];
-
-        // Select appropriate patterns
-        switch (contentType.toLowerCase()) {
-            case 'url':
-                patterns = this.urlPatterns;
-                break;
-            case 'email':
-                patterns = this.emailPatterns;
-                break;
-            case 'message':
-                patterns = this.messagePatterns;
-                break;
-            case 'phone':
-                patterns = this.phonePatterns;
-                break;
-            default:
-                patterns = [...this.emailPatterns, ...this.messagePatterns];
-        }
-
-        // Enhanced pattern matching with weights and multipliers
-        patterns.forEach(({ pattern, description, score: baseScore, weight }) => {
-            const matches = content.match(pattern) || [];
-            if (matches.length > 0) {
-                // Apply weight multiplier
-                const weightMultiplier = this.patternWeights[weight] || 1.0;
-                
-                // Apply frequency multiplier (diminishing returns)
-                const frequencyMultiplier = matches.length > 1 ? 
-                    1 + Math.log(matches.length) * 0.3 : 1;
-                
-                const adjustedScore = Math.round(baseScore * weightMultiplier * frequencyMultiplier);
-                score += adjustedScore;
-                
-                const patternDescription = matches.length > 1 ? 
-                    `${description} (${matches.length}x)` : description;
-                detectedPatterns.push(patternDescription);
-                
-                details.push(`Pattern: ${description} | Weight: ${weight} | Score: +${adjustedScore}`);
-            }
-        });
-
-        return { score, details };
-    }
-
-    _analyzeContext(content, contentType, detectedPatterns) {
-        let score = 0;
-        const details = [];
-
-        // Content length analysis
-        if (content.length < this.contextFactors.tooShort.threshold) {
-            score += this.contextFactors.tooShort.score;
-            detectedPatterns.push(this.contextFactors.tooShort.description);
-            details.push(`Context: Content too short (${content.length} chars) | Score: +${this.contextFactors.tooShort.score}`);
-        } else if (content.length > this.contextFactors.tooLong.threshold) {
-            score += this.contextFactors.tooLong.score;
-            detectedPatterns.push(this.contextFactors.tooLong.description);
-            details.push(`Context: Content too long (${content.length} chars) | Score: +${this.contextFactors.tooLong.score}`);
-        }
-
-        // Character set analysis
-        const charAnalysis = this._analyzeCharacterSets(content);
-        score += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
-        details.push(...charAnalysis.details);
-
-        // URL-specific context analysis
-        if (contentType === 'url') {
-            const urlContext = this._analyzeUrlContext(content);
-            score += urlContext.score;
-            detectedPatterns.push(...urlContext.factors);
-            details.push(...urlContext.details);
-        }
-
-        return { score, details };
-    }
-
-    _analyzeTextQuality(content, detectedPatterns) {
-        let score = 0;
-        const details = [];
-
-        const words = content.toLowerCase()
-            .replace(/[^\w\s]/g, ' ')
-            .split(/\s+/)
-            .filter(word => word.length > 2);
-
-        if (words.length === 0) {
-            return { score: 0, details: [] };
-        }
-
-        // Vocabulary analysis
-        const uncommonWords = words.filter(word => !this.commonWords.has(word));
-        const vocabularyRatio = uncommonWords.length / words.length;
-
-        if (vocabularyRatio > 0.8) {
-            score += 35;
-            detectedPatterns.push('Very poor vocabulary/spelling detected');
-            details.push(`Text Quality: High uncommon word ratio (${Math.round(vocabularyRatio * 100)}%) | Score: +35`);
-        } else if (vocabularyRatio > 0.6) {
-            score += 25;
-            detectedPatterns.push('Poor text quality detected');
-            details.push(`Text Quality: Moderate uncommon word ratio (${Math.round(vocabularyRatio * 100)}%) | Score: +25`);
-        }
-
-        // Capitalization analysis
-        const capsCount = (content.match(/[A-Z]/g) || []).length;
-        const capsRatio = content.length > 0 ? capsCount / content.length : 0;
-
-        if (capsRatio > 0.4 && content.length > 20) {
-            score += 30;
-            detectedPatterns.push('Excessive capitalization (shouting)');
-            details.push(`Text Quality: Excessive caps ratio (${Math.round(capsRatio * 100)}%) | Score: +30`);
-        } else if (capsRatio > 0.2 && content.length > 50) {
-            score += 20;
-            detectedPatterns.push('High capitalization detected');
-            details.push(`Text Quality: High caps ratio (${Math.round(capsRatio * 100)}%) | Score: +20`);
-        }
-
-        // Repetitive pattern analysis
-        const repetitivePatterns = [
-            /(.)\1{4,}/, // Same character 5+ times
-            /(\w+)\s+\1\s+\1/, // Same word repeated 3+ times
-            /!{4,}|\?{4,}|\.{5,}/ // Excessive punctuation
-        ];
-
-        repetitivePatterns.forEach(pattern => {
-            if (pattern.test(content)) {
-                score += 25;
-                detectedPatterns.push('Repetitive or excessive patterns detected');
-                details.push('Text Quality: Repetitive patterns found | Score: +25');
-            }
-        });
-
-        return { score, details };
-    }
-
-    _analyzeContentSpecific(content, contentType, detectedPatterns) {
-        let score = 0;
-        const details = [];
-
-        switch (contentType.toLowerCase()) {
-            case 'email':
-                const emailAnalysis = this._analyzeEmailStructure(content);
-                score += emailAnalysis.score;
-                detectedPatterns.push(...emailAnalysis.factors);
-                details.push(...emailAnalysis.details);
-                break;
-                
-            case 'url':
-                const urlAnalysis = this._analyzeUrlStructure(content);
-                score += urlAnalysis.score;
-                detectedPatterns.push(...urlAnalysis.factors);
-                details.push(...urlAnalysis.details);
-                break;
-                
-            case 'phone':
-                const phoneAnalysis = this._analyzePhoneStructure(content);
-                score += phoneAnalysis.score;
-                detectedPatterns.push(...phoneAnalysis.factors);
-                details.push(...phoneAnalysis.details);
-                break;
-        }
-
-        return { score, details };
-    }
-
-    _analyzeCharacterSets(content) {
-        let score = 0;
-        const factors = [];
-        const details = [];
-
-        const characterSets = {
-            latin: /[a-zA-Z]/.test(content),
-            cyrillic: /[\u0400-\u04FF]/.test(content),
-            greek: /[\u0370-\u03FF]/.test(content),
-            arabic: /[\u0600-\u06FF]/.test(content),
-            chinese: /[\u4E00-\u9FFF]/.test(content),
-            japanese: /[\u3040-\u309F\u30A0-\u30FF]/.test(content)
-        };
-
-        const activeSets = Object.keys(characterSets).filter(set => characterSets[set]);
-
-        if (activeSets.length > 1) {
-            score = 35 + (activeSets.length - 2) * 15;
-            factors.push(`Mixed character sets: ${activeSets.join(', ')} (homograph attack risk)`);
-            details.push(`Character Sets: Mixed scripts detected (${activeSets.join(', ')}) | Score: +${score}`);
-        }
-
-        // Hidden Unicode characters
-        const hiddenUnicode = /[\u200B-\u200F\u202A-\u202E\u2060-\u2064]/.test(content);
-        if (hiddenUnicode) {
-            score += 45;
-            factors.push('Hidden Unicode characters detected');
-            details.push('Character Sets: Hidden Unicode characters found | Score: +45');
-        }
-
-        return { score, factors, details };
-    }
-
-    _analyzeUrlContext(url) {
-        let score = 0;
-        const factors = [];
-        const details = [];
-
+    _analyzeUrl(url) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
         try {
             const urlObj = new URL(url);
-            const domain = urlObj.hostname.toLowerCase();
-            const path = urlObj.pathname;
-
-            // Domain analysis
-            if (domain.length > 40) {
-                score += 25;
-                factors.push('Extremely long domain name');
-                details.push(`URL Context: Very long domain (${domain.length} chars) | Score: +25`);
+            if (!urlObj.protocol.startsWith('http')) {
+                throw new Error('Invalid protocol');
             }
-
-            // Subdomain analysis
-            const subdomains = domain.split('.');
-            if (subdomains.length > 5) {
-                score += 30;
-                factors.push('Excessive subdomains detected');
-                details.push(`URL Context: Too many subdomains (${subdomains.length}) | Score: +30`);
-            }
-
-            // Path traversal attempts
-            if (path.includes('..')) {
-                score += 50;
-                factors.push('Path traversal attempt detected');
-                details.push('URL Context: Path traversal detected | Score: +50');
-            }
-
-            // Query parameter analysis
-            const paramString = urlObj.search;
-            if (paramString.length > 300) {
-                score += 20;
-                factors.push('Excessively long query parameters');
-                details.push(`URL Context: Long query params (${paramString.length} chars) | Score: +20`);
-            }
-
-        } catch (e) {
-            // URL parsing failed - already handled in main analysis
+        } catch (error) {
+            return {
+                level: 'high',
+                score: 100,
+                factors: ['Invalid URL format'],
+                details: 'The provided URL is not properly formatted or uses an invalid protocol.',
+                timestamp: new Date().toISOString()
+            };
         }
-
-        return { score, factors, details };
+        
+    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
+        
+        return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
 
-    _analyzeEmailStructure(content) {
+    _analyzeEmail(emailContent) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
+    riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
+        
+        return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
+    }
+
+    _analyzeMessage(message) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
+    riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
+        
+        return this._formatResult(riskScore, detectedPatterns, message, 'Message');
+    }
+
+    _checkPatterns(content, patterns, detectedPatterns) {
         let score = 0;
-        const factors = [];
-        const details = [];
-
-        // Check for standard email elements
-        const hasSubject = /subject:/i.test(content);
-        const hasFrom = /from:/i.test(content);
-        const hasTo = /to:/i.test(content);
-
-        if (!hasSubject && !hasFrom && !hasTo && content.length > 100) {
-            score += 15;
-            factors.push('Missing standard email headers');
-            details.push('Email Structure: Missing standard headers | Score: +15');
+        for (const { pattern, description, score: patternScore } of patterns) {
+            if (pattern.test(content)) {
+                score += patternScore;
+                if (patternScore > 0) {
+                    detectedPatterns.push(description);
+                }
+            }
         }
+        return score;
+    }
 
-        // Check for suspicious HTML/formatting
-        const hasHiddenText = /style\s*=\s*['"](color:\s*(white|#fff)|font-size:\s*0|display:\s*none)['"]/i.test(content);
-        if (hasHiddenText) {
-            score += 40;
-            factors.push('Hidden text formatting detected');
-            details.push('Email Structure: Hidden text detected | Score: +40');
-        }
+    _formatResult(riskScore, detectedPatterns, content, contentType) {
+        const finalScore = Math.max(0, riskScore);
+        const level = this._calculateRiskLevel(finalScore);
+        
+        return {
+            level,
+            score: finalScore,
+            factors: detectedPatterns,
+            details: this._generateAnalysisDetails(contentType, content, finalScore, detectedPatterns),
+            timestamp: new Date().toISOString()
+        };
+    }
 
-        // Multiple links analysis
-        const urlMatches = content.match(/https?:\/\/[^\s]+/g) || [];
-        if (urlMatches.length > 8) {
-            score += 35;
-            factors.push(`Excessive links detected (${urlMatches.length} links)`);
-            details.push(`Email Structure: Too many links (${urlMatches.length}) | Score: +35`);
+    _calculateRiskLevel(riskScore) {
+        if (riskScore >= 60) return 'high';
+        if (riskScore >= 30) return 'medium';
+        return 'low';
+    }
+
+    _generateAnalysisDetails(contentType, content, riskScore, patterns) {
+        let details = `${contentType} Analysis Summary:\n\n`;
+        details += `Risk Score: ${riskScore}/100\n`;
+        details += `Risk Level: ${this._calculateRiskLevel(riskScore).toUpperCase()}\n\n`;
+        
+        if (patterns.length > 0) {
+            details += "Risk Indicators Found:\n";
+            patterns.forEach(pattern => details += `• ${pattern}\n`);
+        } else {
+            details += "No specific risk indicators detected.\n";
         }
+        
+        details += "\nRecommendations:\n";
+        if (riskScore >= 60) {
+            details += "• HIGH RISK: Avoid this content\n• Do not interact or provide information\n• Report if received unsolicited";
+        } else if (riskScore >= 30) {
+            details += "• MEDIUM RISK: Exercise caution\n• Verify source independently\n• Avoid sharing personal information";
+        } else {
+            details += "• LOW RISK: Content appears relatively safe\n• Still exercise normal security practices\n• Verify authenticity for important matters";
+        }
+        
+        return details;
     }
 }
+
 // Analysis History Storage
 class AnalysisHistory {
     constructor() {
