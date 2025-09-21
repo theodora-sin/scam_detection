@@ -1,26 +1,22 @@
-.scam-types-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: flex-start;
-    align-items: stretch;
-    margin-bottom: 2rem;
+/* Force hide URL and Email radio buttons and their wrappers in detailed analysis */
+#main-screen #analysis-url,
+#main-screen #analysis-email,
+#main-screen label[for="analysis-url"],
+#main-screen label[for="analysis-email"],
+#main-screen #analysis-url.radio-option,
+#main-screen #analysis-email.radio-option,
+#main-screen .radio-option input#analysis-url,
+#main-screen .radio-option input#analysis-email,
+#main-screen .radio-option label[for="analysis-url"],
+#main-screen .radio-option label[for="analysis-email"] {
+    display: none !important;
 }
-.scam-type-card {
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 12px;
-    padding: 1.5rem;
-    min-width: 220px;
-    max-width: 320px;
-    flex: 1 1 220px;
-    margin-bottom: 0;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    background: none !important;
-    box-shadow: none !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+/* Hide URL and Email radio buttons in content analysis form */
+#analysis-url,
+#analysis-email,
+label[for="analysis-url"],
+label[for="analysis-email"] {
+    display: none !important;
 }
 /* Hide the Perform Analysis button in content analysis form */
 #main-screen #analysis-form button[type="submit"] {
@@ -615,6 +611,8 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
 
 
 
