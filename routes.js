@@ -37,7 +37,7 @@ class ScamAnalyzer {
             { pattern: /\.(exe|scr|bat|com|pif|vbs|jar|zip|rar)(\?|$)/i, description: 'Suspicious file extension in URL', score: 70 },
             
             // URL encoding abuse
-            { pattern: /%[0-9a-f]{2}{3,}/i, description: 'Excessive URL encoding (potential obfuscation)', score: 35 }
+            { pattern: /(%[0-9a-f]{2}){3,}/i, description: 'Excessive URL encoding (potential obfuscation)', score: 35 }
         ];
 
         // === EXPANDED EMAIL PATTERNS ===
