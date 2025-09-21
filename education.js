@@ -120,7 +120,7 @@ class EducationScreen {
         // Add warning section based on your original content
         const warningSection = `
             <div class="warning-card" style="background: #f8d7da; border-color: #dc3545; color: #721c24; margin-bottom: 2rem;">
-                <h4>⚠️ If you suspect this website is a scam:</h4>
+                <h4>⚠️ If you suspect the website is a scam:</h4>
                 <ul style="margin: 1rem 0; padding-left: 2rem;">
                     <li>Do NOT click the link</li>
                     <li>Find someone you trust</li>
