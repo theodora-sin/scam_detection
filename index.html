@@ -172,38 +172,6 @@
     <script src="startscreen.js"></script>
     <script src="mainscreen.js"></script>
     <script src="education.js"></script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.app && window.app.screens && window.app.screens.start) {
-        // Already initialized by backend.js
-        return;
-    }
-    // Fallback: simple quick analysis handler
-    const form = document.getElementById('quick-analysis-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const contentType = form.querySelector('input[name="content_type"]:checked').value;
-            const content = form.querySelector('textarea[name="content"]').value;
-            if (!content.trim()) return;
-            // Use your ScamAnalyzer class (must be available globally)
-            if (window.ScamAnalyzer) {
-                const analyzer = new ScamAnalyzer();
-                const result = analyzer.analyzeContent(content, contentType);
-                const resultsDiv = document.getElementById('quick-results');
-                resultsDiv.innerHTML = `
-                    <div class="risk-assessment risk-${result.level}">
-                        <h3>Risk Level: ${result.level.toUpperCase()}</h3>
-                        <p>Score: ${result.score}/100</p>
-                        <p>${result.details.replace(/\\n/g, '<br>')}</p>
-                    </div>
-                `;
-                resultsDiv.style.display = 'block';
-            }
-        });
-    }
-});
-</script>
 
     <!-- Picture Files -->
     <script src="logo.png"></script>
