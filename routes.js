@@ -342,7 +342,11 @@ class ScamAnalyzer {
             score: finalScore,
             factors: detectedPatterns,
             details: this._generateAnalysisDetails(contentType, content, finalScore, detectedPatterns),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            // For UI compatibility:
+            risk_level: level,
+            risk_score: finalScore,
+            detected_patterns: detectedPatterns
         };
     }
 
