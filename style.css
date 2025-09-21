@@ -1,25 +1,5 @@
-/* Hide only the Message radio button and its label in detailed analysis */
-#main-screen #analysis-message,
-#main-screen label[for="analysis-message"],
-#main-screen .radio-option input#analysis-message,
-#main-screen .radio-option label[for="analysis-message"] {
-    display: none !important;
-}
-/* Force hide URL and Email radio buttons and their wrappers in detailed analysis */
-#main-screen #analysis-url,
-#main-screen #analysis-email,
-#main-screen label[for="analysis-url"],
-#main-screen label[for="analysis-email"],
-#main-screen #analysis-url.radio-option,
-#main-screen #analysis-email.radio-option,
-#main-screen .radio-option input#analysis-url,
-#main-screen .radio-option input#analysis-email,
-#main-screen .radio-option label[for="analysis-url"],
-#main-screen .radio-option label[for="analysis-email"] {
-    display: none !important;
-}
-/* Hide URL and Email radio buttons in content analysis form */
-#analysis-url,
+/* Hide message and Email radio buttons in content analysis form */
+#analysis-message,
 #analysis-email,
 label[for="analysis-url"],
 label[for="analysis-email"] {
@@ -618,12 +598,6 @@ textarea {
         align-items: flex-start;
     }
 }
-
-
-
-
-
-
 
 
 
