@@ -78,6 +78,7 @@ class EducationScreen {
             `<div class="scam-type-card"><h4>${type.name}</h4><p>${type.category}</p><p>${type.warning_signs}</p><p>${type.prevention_tips}</p><p>Severity: ${type.severity.toUpperCase()}</p><p>${type.description}</p><h5>⚠️ Warning Signs:</h5><p>${type.warning_signs}</p><h5>💡 Prevention Tips:</h5><p>${type.prevention_tips}</p><div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;"><small><strong>Severity:</strong> ${type.severity.toUpperCase()}</small></div><p><strong>Description:</strong> ${type.description}</p></div>`
         ).join('');
     }
+
     searchScamTypes(query) {
         const resultsContainer = document.getElementById('scam-types-list');
         if (!resultsContainer) return;
@@ -176,6 +177,14 @@ class EducationScreen {
                 severity: "high",
             },
             {
+                name: "Account/Password Reset Scam",
+                category: "Phishing",
+                description: "Messages pretending to be from legitimate or popular services, claiming your account is compromised and urging you to reset your password via a provided link.",
+                warning_signs: "Unexpected password reset emails, links to fake websites, requests for personal information",
+                prevention_tips: "never click on links in unsolicited resest emails, go directly to the official website to reset passwords, enable two-factor authentication",
+                severity: "high",
+            },                        
+            {
                 name: "Tech Support Scam",
                 category: "Service Fraud",
                 description: "Scammers pose as technical support to gain remote access to computers or steal money.",
@@ -192,11 +201,43 @@ class EducationScreen {
                 severity: "medium",
             },
             {
+                name:"Charity/Disaster Scam",
+                category: "Financial Fraud",
+                description: "Fake charities or disaster relief efforts soliciting donations that go to scammers instead of victims.",
+                warning_signs: "Pressure to donate immediately, no proof of legitimacy, vague or generic charity names",
+                prevention_tips: "Research charities on official registries, donate through trusted organizations, never give in to urgent pressure",
+                severity: "medium",
+            },
+            {
+                name: "Police/Tax Authority Scam",
+                category: "Government Impersonation",
+                description: "Scammers impersonate police or tax authorities, threatening arrest or legal action to extort money.",
+                warning_signs: "Unsolicited calls or messages, threats of arrest, demands for immediate payment, requests for personal information",
+                prevention_tips: "Government agencies don’t demand payments over the phone, hang up and verify independently",
+                severity: "high",
+            },
+            {
                 name: "Investment/Cryptocurrency Scam",
                 category: "Financial Fraud",
                 description: "Fraudulent investment opportunities promising unrealistic returns, often involving cryptocurrency.",
                 warning_signs: "Guaranteed high returns, pressure to invest quickly, unlicensed sellers, complex fee structures, celebrity endorsements",
                 prevention_tips: "Research investments thoroughly, verify licenses, be skeptical of guaranteed returns, check regulatory warnings",
+                severity: "high",
+            },
+            {
+                name: "Lottery/Prize Scam",
+                category: "Financial Fraud",
+                description: "Notifications claiming you've won a lottery or prize, requiring payment of fees or taxes to claim.",
+                warning_signs: "Unexpected prize notifications, requests for upfront fees or taxes, pressure to act quickly, no proof of winning",
+                prevention_tips: "Legitimate lotteries don’t ask for fees, verify through official sources, never send money to claim prizes",
+                severity: "high",
+            },
+            {
+                name: "Credit Cardd/Payment Scam",
+                category: "Financial Fraud",
+                description: "Fraudulent messages claiming issues with your credit card or payment method, urging you to verify details via a link.",
+                warning_signs: "Unexpected payment issues, links to fake websites, requests for card details or personal information",
+                prevention_tips: "Use secure payment platforms, never share card details over email or phone, check for HTTPS",
                 severity: "high",
             },
             {
@@ -208,13 +249,38 @@ class EducationScreen {
                 severity: "medium",
             },
             {
+                name: "Delivery/Parcel Scam",
+                category: "Consumer Fraud",
+                description: "Fake delivery notifications claimng a package is undeliverable or requires payment to release.",
+                warning_signs: "Unexpected delivery notifications, requests for payment or personal information to release a package, links to fake courier websites",
+                prevention_tips: "Check with official courier services directly, don’t click on suspicious links, never pay fees for unknown packages",
+                severity: "medium",
+            },
+            {
+                name: "Rental/Real Estate Scam",
+                category: "Property Fraud",
+                description: "Fake rental listings or real estate offers designed to steal deposits or personal information.",
+                warning_signs:"Pressure to send money before viewing, below-market prices, landlords unavailable to meet",
+                prevention_tips: "Always view properties in person, verify landlord identity, use reputable rental platforms, never send money upfront",
+                severity: "medium",
+            },            
+            {
                 name: "Social Security Scam",
                 category: "Government Impersonation",
                 description: "Criminals impersonate Social Security Administration officials to steal personal information or money.",
                 warning_signs: "Threats of arrest or legal action, demands for immediate payment, requests for Social Security number verification",
                 prevention_tips: "SSA will never call you demanding immediate payment, verify independently by calling official SSA number, never give SSN over phone",
                 severity: "high",
+            },
+            {
+                name: "Police/Tax Authortiy Scam",
+                category: "Government Impersonation",
+                description: "Scammers impersonate police or tax authorities, threatening arrest or legal action to extort money.",
+                warning_signs: "Unsolicited calls or messages, threats of arrest, demands for immediate payment, requests for personal information",
+                prevention_tips: "Government agencies don’t demand payments over the phone, hang up and verify independently",
+                severity: "high",
             }
+
         ];
     }
 
