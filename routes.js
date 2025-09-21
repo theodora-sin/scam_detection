@@ -286,9 +286,13 @@ class ScamAnalyzer {
     _analyzeUrl(url) {
         let riskScore = 0;
         const detectedPatterns = [];
-        
+        // Auto-prefix protocol if missing
+        let urlToCheck = url;
+        if (!/^https?:\/\//i.test(urlToCheck)) {
+            urlToCheck = 'http://' + urlToCheck;
+        }
         try {
-            const urlObj = new URL(url);
+            const urlObj = new URL(urlToCheck);
             if (!urlObj.protocol.startsWith('http')) {
                 throw new Error('Invalid protocol');
             }
@@ -301,10 +305,8 @@ class ScamAnalyzer {
                 timestamp: new Date().toISOString()
             };
         }
-        
-    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
-        
+        riskScore += this._checkPatterns(urlToCheck, this.urlPatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(urlToCheck, this.legitimatePatterns, []);
         return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
 
