@@ -91,7 +91,7 @@ class MainScreen {
                 <h4>📋 Complete Analysis Report</h4>
                 <p><strong>Content Type:</strong> ${(analysis.content_type || 'unknown').toUpperCase()}</p>
                 <p><strong>Analyzed Content:</strong></p>
-                <div style="padding: 1rem; margin: 1rem 0; background: none; border-radius: 0;">
+                <div style="padding: 1rem; margin: 1rem 0; background: transparent !important; border-radius: 0 !important; box-shadow: none !important;">
                     <code>${this.app.escapeHtml(analysis.content || 'No content')}</code>
                 </div>
                 ${(analysis.detected_patterns || analysis.factors || []).length > 0 ? `
@@ -101,12 +101,13 @@ class MainScreen {
                     </ul>
                 ` : '<p>✅ No specific risk indicators detected.</p>'}
                 <h5>📝 Detailed Analysis Report:</h5>
-                <pre style="white-space: pre-wrap; background: none; padding: 1rem; border-radius: 0; font-size: 0.9rem;">${analysis.analysis_details || analysis.details || 'No details available'}</pre>
-                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; background: none;">
+                <pre style="white-space: pre-wrap; background: transparent !important; padding: 1rem; border-radius: 0 !important; font-size: 0.9rem; box-shadow: none !important;">${analysis.analysis_details || analysis.details || 'No details available'}</pre>
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; background: none !important;">
                     <small>📅 Analysis completed: ${analysis.created_at ? new Date(analysis.created_at).toLocaleString() : new Date().toLocaleString()}</small>
                 </div>
             </div>
         `;
+        resultsContainer.style.display = 'block';
 
         resultsContainer.style.display = 'block';
     }
