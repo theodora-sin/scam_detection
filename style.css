@@ -1,3 +1,9 @@
+/* Make common scam types list scrollable in education screen */
+#scam-types-list, .scam-types-list {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
 /* Also hide the parent .radio-option wrappers for Email and Message in content analysis form */
 #main-screen .radio-option input#analysis-email,
 #main-screen .radio-option input#analysis-message {
