@@ -168,139 +168,73 @@ class ScamAnalyzer {
         };
     }
 
-    analyzeContent(content, contentType) {
-        try {
-        if (!content || !contentType) {
-            return this._formatResult(0, [], content || '', contentType || 'Unknown');
-        }
+    // === CONTEXT FACTORS ===
+    _applyContextFactors(content, baseScore, detectedCount) {
+        let extra = 0;
+        const length = content.length;
 
-        switch (contentType.toLowerCase()) {
-            case 'url':
-                return this._analyzeUrl(content);
-            case 'email':
-                return this._analyzeEmail(content);
-            case 'message':
-                return this._analyzeMessage(content);
-            default:
-                return this._formatResult(0, [], content, contentType);
-        }
-        } catch (error) {
-            console.error('Analysis error:', error);
-            return {
-                level: 'unknown',
-                score: 0,
-                factors: [],
-                details: `Error during analysis: ${error.message}`,
-                timestamp: new Date().toISOString()
-            }
-        }
+        if (length < this.contextFactors.tooShort.threshold) extra += this.contextFactors.tooShort.score;
+        if (length > this.contextFactors.tooLong.threshold) extra += this.contextFactors.tooLong.score;
+
+        const density = detectedCount / Math.max(1, length);
+        if (density > this.contextFactors.highDensity.threshold) extra += this.contextFactors.highDensity.score;
+
+        const nonAsciiRatio = (content.match(/[^\x00-\x7F]/g) || []).length / length;
+        if (nonAsciiRatio > this.contextFactors.nonAscii.threshold) extra += this.contextFactors.nonAscii.score;
+
+        if (/[а-яё]/i.test(content) && /[a-z]/i.test(content)) extra += this.contextFactors.mixedScripts.score;
+
+        return baseScore + extra;
     }
 
-    _analyzeUrl(url) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-        try {
-            const urlObj = new URL(url);
-            if (!urlObj.protocol.startsWith('http')) {
-                throw new Error('Invalid protocol');
-            }
-        } catch (error) {
-            return {
-                level: 'high',
-                score: 100,
-                factors: ['Invalid URL format'],
-                details: 'The provided URL is not properly formatted or uses an invalid protocol.',
-                timestamp: new Date().toISOString()
-            };
-        }
-        
-    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
-        
-        return this._formatResult(riskScore, detectedPatterns, url, 'URL');
-    }
-
-    _analyzeEmail(emailContent) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-    riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
-        
-        return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
-    }
-
-    _analyzeMessage(message) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-    riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
-        
-        return this._formatResult(riskScore, detectedPatterns, message, 'Message');
-    }
-
-    _checkPatterns(content, patterns, detectedPatterns) {
-        let score = 0;
-        for (const { pattern, description, score: patternScore } of patterns) {
-            if (pattern.test(content)) {
-                score += patternScore;
-                if (patternScore > 0) {
-                    detectedPatterns.push(description);
-                }
-            }
-        }
-        return score;
-    }
-
-    _formatResult(riskScore, detectedPatterns, content, contentType) {
-        const finalScore = Math.max(0, riskScore);
+    // === RESULT FORMATTING ===
+    _formatResult(riskScore, detected, content, type) {
+        riskScore = this._applyContextFactors(content, riskScore, detected.length);
+        const finalScore = Math.min(100, Math.max(0, Math.round(riskScore)));
         const level = this._calculateRiskLevel(finalScore);
+
         return {
             level,
             score: finalScore,
-            factors: detectedPatterns,
-            details: this._generateAnalysisDetails(contentType, content, finalScore, detectedPatterns),
+            factors: detected,
+            details: this._generateAnalysisDetails(type, content, finalScore, detected),
             timestamp: new Date().toISOString(),
-            // For UI compatibility:
             risk_level: level,
             risk_score: finalScore,
-            detected_patterns: detectedPatterns
+            detected_patterns: detected
         };
     }
 
-    _calculateRiskLevel(riskScore) {
-        if (riskScore >= 60) return 'high';
-        if (riskScore >= 30) return 'medium';
+    _calculateRiskLevel(score) {
+        if (score >= this.riskThresholds.high) return 'high';
+        if (score >= this.riskThresholds.medium) return 'medium';
         return 'low';
     }
 
-    _generateAnalysisDetails(contentType, content, riskScore, patterns) {
-        let details = `${contentType} Analysis Summary:\n\n`;
-        details += `Risk Score: ${riskScore}/100\n`;
-        details += `Risk Level: ${this._calculateRiskLevel(riskScore).toUpperCase()}\n\n`;
-        
+    _generateAnalysisDetails(type, content, score, patterns) {
+        let details = `${type} Analysis Summary:\n\n`;
+        details += `Risk Score: ${score}/100\n`;
+        details += `Risk Level: ${this._calculateRiskLevel(score).toUpperCase()}\n\n`;
+
         if (patterns.length > 0) {
             details += "Risk Indicators Found:\n";
-            patterns.forEach(pattern => details += `• ${pattern}\n`);
+            patterns.forEach(p => details += `• ${p}\n`);
         } else {
             details += "No specific risk indicators detected.\n";
         }
-        
+
         details += "\nRecommendations:\n";
-        if (riskScore >= 60) {
-            details += "• HIGH RISK: Avoid this content\n• Do not interact or provide information\n• Report if received unsolicited";
-        } else if (riskScore >= 30) {
-            details += "• MEDIUM RISK: Exercise caution\n• Verify source independently\n• Avoid sharing personal information";
+        if (score >= this.riskThresholds.high) {
+            details += "• HIGH RISK: Avoid this content.\n• Do not interact or provide info.\n• Report if unsolicited.";
+        } else if (score >= this.riskThresholds.medium) {
+            details += "• MEDIUM RISK: Exercise caution.\n• Verify source independently.\n• Avoid sharing personal info.";
         } else {
-            details += "• LOW RISK: Content appears relatively safe\n• Still exercise normal security practices\n• Verify authenticity for important matters";
+            details += "• LOW RISK: Appears relatively safe.\n• Still use normal precautions.\n• Verify authenticity for important matters.";
         }
-        
+
         return details;
     }
 }
-
 // Analysis History Storage
 class AnalysisHistory {
     constructor() {
