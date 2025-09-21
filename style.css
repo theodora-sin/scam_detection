@@ -1,16 +1,16 @@
 body {
-    background: hsl(0 0% 0%) !important;
-    background-image: linear-gradient(120deg, #0ff1ce 0%, #3700ff 50%, #ff0080 100%) !important;
-    background-blend-mode: overlay !important;
-    color: #fff !important;
     font-family: 'Inter', sans-serif !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
+    color: var(--foreground) !important;
+    background-color: var(--ultra-dark) !important;
+    background-image: linear-gradient(135deg, hsl(260, 100%, 10%), hsl(210, 100%, 7%), hsl(0, 0%, 0%)) !important;
+    background-repeat: no-repeat !important;
     min-height: 100vh !important;
     width: 100vw !important;
-    min-width: 100vw !important;
     box-sizing: border-box !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
 }
+
 /* Make nav links horizontal and remove list-style */
 .nav-links, ul.nav-links {
     display: flex !important;
