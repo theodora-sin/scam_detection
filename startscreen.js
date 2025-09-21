@@ -136,7 +136,7 @@ class StartScreen {
                         </ul>
                     ` : '<p class="text-green-400 mb-4">✅ No specific risk indicators detected.</p>'}
                     <div class="mt-6 pt-4 border-t border-gray-700">
-                        <button class="w-full sm:w-auto blue-charcoal-gradient hover:neon-glow border-2 border-neon-cyan text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300" onclick="app.showScreen('main')">
+                        <button class="text-lg font-bold text-white mb-4"onclick="app.showScreen('main')">
                             🔍 View Detailed Analysis
                         </button>
                     </div>
