@@ -1,3 +1,10 @@
+/* Hide only the Message radio button and its label in detailed analysis */
+#main-screen #analysis-message,
+#main-screen label[for="analysis-message"],
+#main-screen .radio-option input#analysis-message,
+#main-screen .radio-option label[for="analysis-message"] {
+    display: none !important;
+}
 /* Force hide URL and Email radio buttons and their wrappers in detailed analysis */
 #main-screen #analysis-url,
 #main-screen #analysis-email,
