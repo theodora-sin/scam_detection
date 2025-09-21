@@ -246,6 +246,7 @@ class ScamAnalyzer {
         ]);
     }
 
+
     analyzeContent(content, contentType) {
         try {
             if (!content || !contentType) {
@@ -293,13 +294,8 @@ class ScamAnalyzer {
             };
         }
         
-        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-        riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
-        
-        // Add character analysis
-        const charAnalysis = this._analyzeCharacterSets(url);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
+    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
@@ -308,20 +304,9 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        // Original pattern check
-        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-        riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
+    riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
         
-        // Add text quality analysis
-        const qualityAnalysis = this._analyzeTextQuality(emailContent);
-        riskScore += qualityAnalysis.score;
-        detectedPatterns.push(...qualityAnalysis.factors);
-        
-        // Character analysis
-        const charAnalysis = this._analyzeCharacterSets(emailContent);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
-
         return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
     }
 
@@ -329,90 +314,10 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-        // Original pattern check
-        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-        riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
-        
-        // Add text quality analysis
-        const qualityAnalysis = this._analyzeTextQuality(message);
-        riskScore += qualityAnalysis.score;
-        detectedPatterns.push(...qualityAnalysis.factors);
-
-        // Character analysis
-        const charAnalysis = this._analyzeCharacterSets(message);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
+    riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+    riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
         
         return this._formatResult(riskScore, detectedPatterns, message, 'Message');
-    }
-
-    // --- NEW METHOD for Spelling/Grammar Analysis (simplified) ---
-    _analyzeTextQuality(content) {
-        if (!content || typeof content !== 'string') {
-            return { score: 0, factors: [] };
-        }
-
-        const words = content.toLowerCase()
-            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
-            .split(/\s+/)
-            .filter(word => word.length > 2);
-        
-        if (words.length === 0) {
-            return { score: 0, factors: [] };
-        }
-
-        // Simple spelling check using common words
-        const misspelledWords = words.filter(word => !this.commonWords.has(word));
-        const errorDensity = misspelledWords.length / words.length;
-        
-        let score = 0;
-        let factors = [];
-
-        if (errorDensity > 0.7) { // If more than 70% of words are not in common words list
-            score = 40;
-            factors.push(`Extremely poor text quality (${misspelledWords.length} uncommon words)`);
-        } else if (errorDensity > 0.5) { // If more than 50% of words are not common
-            score = 25;
-            factors.push(`Poor text quality detected (${misspelledWords.length} uncommon words)`);
-        }
-        
-        // Check for excessive capitalization
-        const capsCount = (content.match(/[A-Z]/g) || []).length;
-        const capsRatio = capsCount / content.length;
-        if (capsRatio > 0.3 && content.length > 20) {
-            score += 20;
-            factors.push('Excessive capitalization detected');
-        }
-        
-        return { score, factors };
-    }
-
-    // --- CHARACTER SET ANALYSIS ---
-    _analyzeCharacterSets(content) {
-        if (!content) return { score: 0, factors: [] };
-
-        // Check for mixed character sets (potential homograph attack)
-        const hasLatin = /[a-zA-Z]/.test(content);
-        const hasCyrillic = /[\u0400-\u04FF]/.test(content);
-        const hasGreek = /[\u0370-\u03FF]/.test(content);
-        const hasArabic = /[\u0600-\u06FF]/.test(content);
-
-        let mixedSets = 0;
-        let factors = [];
-        
-        if (hasLatin) mixedSets++;
-        if (hasCyrillic) mixedSets++;
-        if (hasGreek) mixedSets++;
-        if (hasArabic) mixedSets++;
-
-        if (mixedSets > 1) {
-            return {
-                score: 50,
-                factors: ['Mixed character sets detected (potential homograph attack)']
-            };
-        }
-        
-        return { score: 0, factors: [] };
     }
 
     _checkPatterns(content, patterns, detectedPatterns) {
@@ -429,7 +334,7 @@ class ScamAnalyzer {
     }
 
     _formatResult(riskScore, detectedPatterns, content, contentType) {
-        const finalScore = Math.max(0, Math.min(100, riskScore)); // Clamp between 0-100
+        const finalScore = Math.max(0, riskScore);
         const level = this._calculateRiskLevel(finalScore);
         
         return {
@@ -499,9 +404,7 @@ class AnalysisHistory {
                 history.splice(this.maxEntries);
             }
             
-            // Use in-memory storage instead of localStorage to avoid browser restrictions
-            this._memoryStorage = history;
-            
+            localStorage.setItem(this.storageKey, JSON.stringify(history));
             return analysis;
         } catch (error) {
             console.error('Error adding analysis to history:', error);
@@ -511,44 +414,21 @@ class AnalysisHistory {
 
     getHistory() {
         try {
-            // Try localStorage first, fallback to memory storage
             const stored = localStorage.getItem(this.storageKey);
-            if (stored) {
-                return JSON.parse(stored);
-            }
-            return this._memoryStorage || [];
+            return stored ? JSON.parse(stored) : [];
         } catch (error) {
             console.error('Error loading analysis history:', error);
-            return this._memoryStorage || [];
+            return [];
         }
     }
 
     clearHistory() {
         try {
             localStorage.removeItem(this.storageKey);
-            this._memoryStorage = [];
             return true;
         } catch (error) {
             console.error('Error clearing history:', error);
-            this._memoryStorage = [];
-            return true; // Still return true since memory was cleared
+            return false;
         }
     }
-
-    // Save to localStorage when possible
-    _saveToStorage(history) {
-        try {
-            localStorage.setItem(this.storageKey, JSON.stringify(history));
-        } catch (error) {
-            console.warn('Could not save to localStorage, using memory storage only');
-        }
-    }
-}
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { ScamAnalyzer, AnalysisHistory };
-} else if (typeof window !== 'undefined') {
-    window.ScamAnalyzer = ScamAnalyzer;
-    window.AnalysisHistory = AnalysisHistory;
 }
