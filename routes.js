@@ -1,3 +1,4 @@
+// Scam Analyzer Core Engine
 class ScamAnalyzer {
     constructor() {
         // --- UPDATED URL PATTERNS WITH HIGHER SCORES ---
@@ -170,6 +171,135 @@ class ScamAnalyzer {
         return details;
     }
 }
+
+const dictionary = new Typo("en_US", null, null, {
+    dictionaryPath: "/path/to/your/dictionaries" // IMPORTANT: Update this path
+});
+
+class ScamAnalyzer {
+    constructor() {
+        // ... (all your existing patterns remain the same)
+        this.urlPatterns = [
+            // ...
+        ];
+        this.emailPatterns = [
+            // ...
+        ];
+        //...
+    }
+
+    // --- NEW METHOD for Spelling/Grammar ---
+    _analyzeTextQuality(content) {
+        if (!content || typeof content !== 'string') {
+            return { score: 0, factors: [] };
+        }
+
+        const words = content.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s/);
+        const misspelledWords = [];
+
+        words.forEach(word => {
+            if (word.length > 2 && !dictionary.check(word)) {
+                misspelledWords.push(word);
+            }
+        });
+        
+        const errorDensity = misspelledWords.length / words.length;
+        let score = 0;
+        let factors = [];
+
+        if (errorDensity > 0.15) { // If more than 15% of words are misspelled
+            score = 40;
+            factors.push(`Extremely poor spelling and grammar (${misspelledWords.length} errors)`);
+        } else if (errorDensity > 0.05) { // If more than 5% of words are misspelled
+            score = 25;
+            factors.push(`Multiple spelling mistakes detected (${misspelledWords.length} errors)`);
+        }
+        
+        return { score, factors };
+    }
+
+    // ... (your existing _analyzeUrl, etc. methods)
+
+    _analyzeEmail(emailContent) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
+        // Original pattern check
+        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
+        
+        // --- ADD THE NEW ANALYSIS ---
+        const qualityAnalysis = this._analyzeTextQuality(emailContent);
+        riskScore += qualityAnalysis.score;
+        detectedPatterns.push(...qualityAnalysis.factors);
+        
+        // Character analysis (from next section)
+        const charAnalysis = this._analyzeCharacterSets(emailContent);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
+
+        return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
+    }
+
+    _analyzeMessage(message) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
+        // Original pattern check
+        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
+        
+        // --- ADD THE NEW ANALYSIS ---
+        const qualityAnalysis = this._analyzeTextQuality(message);
+        riskScore += qualityAnalysis.score;
+        detectedPatterns.push(...qualityAnalysis.factors);
+
+        // Character analysis (from next section)
+        const charAnalysis = this._analyzeCharacterSets(message);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
+        
+        return this._formatResult(riskScore, detectedPatterns, message, 'Message');
+    }
+    this.urlPatterns = [
+    // ... your existing urlPatterns
+    // --- ADD THIS NEW PATTERN ---
+    { pattern: /xn--/i, description: 'Punycode URL (potential impersonation)', score: 45 }
+    ];_analyzeCharacterSets(content) {
+        if (!content) return { score: 0, factors: [] };
+
+        // This regex checks for the presence of both Latin and Cyrillic characters
+        const hasLatin = /[a-zA-Z]/.test(content);
+        const hasCyrillic = /[\u0400-\u04FF]/.test(content);
+
+        if (hasLatin && hasCyrillic) {
+            return {
+                score: 50,
+                factors: ['Mixed character sets detected (potential homograph attack)']
+            };
+        }
+        return { score: 0, factors: [] };
+    }
+}
+    // ...
+    
+    // Make sure to call this new method inside _analyzeUrl, _analyzeEmail, etc.
+    // as shown in the updated _analyzeEmail and _analyzeMessage methods above.
+    _analyzeUrl(url) {
+        let riskScore = 0;
+        const detectedPatterns = [];
+        
+        // ... (your existing URL analysis code)
+        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+
+        // --- ADD THE NEW CHARACTER ANALYSIS ---
+        const charAnalysis = this._analyzeCharacterSets(url);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
+
+        return this._formatResult(riskScore, detectedPatterns, url, 'URL');
+}
+
 
 // Analysis History Storage
 class AnalysisHistory {
