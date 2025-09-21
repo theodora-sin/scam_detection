@@ -1,9 +1,26 @@
-/* Hide message and Email radio buttons in content analysis form */
-#analysis-message,
-#analysis-email,
-label[for="analysis-url"],
-label[for="analysis-email"] {
-    display: none !important;
+.scam-types-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+    align-items: stretch;
+    margin-bottom: 2rem;
+}
+.scam-type-card {
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 220px;
+    max-width: 320px;
+    flex: 1 1 220px;
+    margin-bottom: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: none !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 /* Hide the Perform Analysis button in content analysis form */
 #main-screen #analysis-form button[type="submit"] {
@@ -113,7 +130,7 @@ table, tr, td, th {
   --chart-5: hsl(323 100% 50%);
   --radius: 0.75rem;
   --shadow: 0 8px 32px 0 rgba(0,0,0,0.45);
-  
+
   /* Ultra-dark gradient colors */
   --ultra-dark: hsl(0 0% 0%);
   --deep-charcoal: hsl(0 0% 6.67%);
@@ -200,28 +217,28 @@ table, tr, td, th {
   .ultra-dark-gradient {
     background: linear-gradient(135deg, #000000 0%, #111111 50%, #1a1a1a 100%);
   }
-  
+
   .purple-black-gradient {
     background: linear-gradient(135deg, #1a0033 0%, #000000 100%);
   }
-  
+
   .blue-charcoal-gradient {
     background: linear-gradient(135deg, #001122 0%, #222222 100%);
   }
-  
+
   .charcoal-black-gradient {
     background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
   }
-  
+
   .neon-border-gradient {
     background: linear-gradient(90deg, #00ffff, #00ff00, #0066ff);
   }
-  
+
   .scan-animation {
     position: relative;
     overflow: hidden;
   }
-  
+
   .scan-animation::after {
     content: '';
     position: absolute;
@@ -232,22 +249,22 @@ table, tr, td, th {
     background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
     animation: scanLine 2s linear infinite;
   }
-  
+
   .encrypted-badge {
     background: linear-gradient(45deg, #00ffff, #00ff00);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .neon-glow {
     box-shadow: 0 0 20px var(--neon-cyan);
   }
-  
+
   .neon-glow-green {
     box-shadow: 0 0 20px var(--neon-green);
   }
-  
+
   .neon-glow-orange {
     box-shadow: 0 0 20px var(--neon-orange);
   }
@@ -598,7 +615,5 @@ textarea {
         align-items: flex-start;
     }
 }
-
-
 
 
