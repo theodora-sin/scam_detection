@@ -134,7 +134,7 @@ class EducationScreen {
             {
                 name: "FTC Fraud Reports",
                 url: "https://reportfraud.ftc.gov/",
-                description: "Report fraud to the Federal Trade Commission"
+                description: "Report fraud to the Federal Trade Commission (USS only)"
             },
             {
                 name: "FBI IC3",
@@ -142,15 +142,20 @@ class EducationScreen {
                 description: "Internet Crime Complaint Center"
             },
             {
-                name: "FTC Scam Alerts",
-                url: "https://www.consumer.ftc.gov/scam-alerts",
-                description: "Stay updated on latest scam alerts"
+                name: "UK Scam Reports",
+                url: "https://www.ncsc.gov.uk/collection/phishing-scams",
+                description: "Spot and report scam emails, texts, websites and calls(UK only)"
             },
             {
                 name: "AARP Fraud Watch",
                 url: "https://www.aarp.org/money/scams-fraud/",
                 description: "Resources and support for fraud victims"
-            }
+            },
+            {
+                name: "Australia Scam Reports",
+                url: "https://www.scamwatch.gov.au/report-a-scam",
+                description: "Report scam emails (Australia only)"
+            }            
         ];
 
         resourcesContainer.innerHTML = warningSection + resources.map(resource => `
