@@ -56,9 +56,9 @@
     flex-direction: column;
     justify-content: flex-start;
 }
-/* Hide the Perform Analysis button in content analysis form */
+/* Show the Perform Analysis button in content analysis form (unhide) */
 #main-screen #analysis-form button[type="submit"] {
-    display: none !important;
+    display: inline-block !important;
 }
 /* Hide Email and Message radio buttons in quick analysis form */
 #quick-email,
