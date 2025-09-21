@@ -1,3 +1,16 @@
+/* Remove white box from analyzed content and analysis report */
+#analysis-results code,
+#analysis-results pre,
+#quick-results code,
+#quick-results pre {
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+}
 /* style.css */
 
 body {
