@@ -1,27 +1,28 @@
-// Scam Analyzer Core Engine
+// Scam Analyzer Core Engine - FIXED VERSION
 class ScamAnalyzer {
     constructor() {
         // --- UPDATED URL PATTERNS WITH HIGHER SCORES ---
         this.urlPatterns = [
-            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 30 }, // Increased from 20
-            { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 40 }, // Increased from 30
-            { pattern: /(paypal|amazon|microsoft|apple|google).*-.*\.com/i, description: 'Suspicious domain mimicking legitimate service', score: 50 }, // Increased from 40
-            { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf|xyz)/i, description: 'Free or suspicious domain hosting', score: 35 }, // Increased from 25
-            { pattern: /(secure|verify|update|confirm).*account/i, description: 'Account security keywords', score: 30 }, // Increased from 15
-            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 25 } // Increased from 20
+            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 30 },
+            { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 40 },
+            { pattern: /(paypal|amazon|microsoft|apple|google).*-.*\.com/i, description: 'Suspicious domain mimicking legitimate service', score: 50 },
+            { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf|xyz)/i, description: 'Free or suspicious domain hosting', score: 35 },
+            { pattern: /(secure|verify|update|confirm).*account/i, description: 'Account security keywords', score: 30 },
+            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 25 },
+            { pattern: /xn--/i, description: 'Punycode URL (potential impersonation)', score: 45 }
         ];
         
         // --- UPDATED EMAIL PATTERNS WITH HIGHER SCORES ---
         this.emailPatterns = [
-            { pattern: /urgent|immediate|act now|limited time|expires today/i, description: 'Urgency tactics', score: 30 }, // Increased from 25
-            { pattern: /verify your account|suspend|locked|frozen/i, description: 'Account threat language', score: 35 }, // Increased from 30
-            { pattern: /click here|download now|claim your prize/i, description: 'Suspicious call-to-action', score: 25 }, // Increased from 20
+            { pattern: /urgent|immediate|act now|limited time|expires today/i, description: 'Urgency tactics', score: 30 },
+            { pattern: /verify your account|suspend|locked|frozen/i, description: 'Account threat language', score: 35 },
+            { pattern: /click here|download now|claim your prize/i, description: 'Suspicious call-to-action', score: 25 },
             { pattern: /winner|congratulations|lottery|prize/i, description: 'Prize/lottery scam language', score: 35 },
             { pattern: /wire transfer|western union|moneygram|bitcoin/i, description: 'Unusual payment methods', score: 40 },
             { pattern: /dear (customer|sir|madam)/i, description: 'Generic greeting', score: 15 },
             { pattern: /[A-Z]{3,}\s+[A-Z]{3,}\s+[A-Z]{3,}/, description: 'Excessive capitalization', score: 10 },
             { pattern: /(\$|€|£)\s*\d{4,}/, description: 'Large money amounts', score: 20 },
-            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz)/i, description: 'Suspicious sender domain', score: 35 } // Increased from 30
+            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz)/i, description: 'Suspicious sender domain', score: 35 }
         ];
         
         this.messagePatterns = [
@@ -40,6 +41,19 @@ class ScamAnalyzer {
             { pattern: /contact us|customer service|help center/i, description: 'Customer service language', score: -5 },
             { pattern: /privacy policy|terms of service|unsubscribe/i, description: 'Legitimate website elements', score: -10 }
         ];
+
+        // Initialize dictionary check (simplified without external dependency)
+        this.commonWords = new Set([
+            'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not', 'on', 
+            'with', 'he', 'as', 'you', 'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we', 
+            'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their',
+            'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me', 'when',
+            'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take', 'people', 'into',
+            'year', 'your', 'good', 'some', 'could', 'them', 'see', 'other', 'than', 'then', 'now',
+            'look', 'only', 'come', 'its', 'over', 'think', 'also', 'back', 'after', 'use', 'two',
+            'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any',
+            'these', 'give', 'day', 'most', 'us'
+        ]);
     }
 
     analyzeContent(content, contentType) {
@@ -89,8 +103,13 @@ class ScamAnalyzer {
             };
         }
         
-    riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
+        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(url, this.legitimatePatterns, []);
+        
+        // Add character analysis
+        const charAnalysis = this._analyzeCharacterSets(url);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
         
         return this._formatResult(riskScore, detectedPatterns, url, 'URL');
     }
@@ -99,9 +118,20 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-    riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
+        // Original pattern check
+        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
         
+        // Add text quality analysis
+        const qualityAnalysis = this._analyzeTextQuality(emailContent);
+        riskScore += qualityAnalysis.score;
+        detectedPatterns.push(...qualityAnalysis.factors);
+        
+        // Character analysis
+        const charAnalysis = this._analyzeCharacterSets(emailContent);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
+
         return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
     }
 
@@ -109,10 +139,90 @@ class ScamAnalyzer {
         let riskScore = 0;
         const detectedPatterns = [];
         
-    riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-    riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
+        // Original pattern check
+        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
+        riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
+        
+        // Add text quality analysis
+        const qualityAnalysis = this._analyzeTextQuality(message);
+        riskScore += qualityAnalysis.score;
+        detectedPatterns.push(...qualityAnalysis.factors);
+
+        // Character analysis
+        const charAnalysis = this._analyzeCharacterSets(message);
+        riskScore += charAnalysis.score;
+        detectedPatterns.push(...charAnalysis.factors);
         
         return this._formatResult(riskScore, detectedPatterns, message, 'Message');
+    }
+
+    // --- NEW METHOD for Spelling/Grammar Analysis (simplified) ---
+    _analyzeTextQuality(content) {
+        if (!content || typeof content !== 'string') {
+            return { score: 0, factors: [] };
+        }
+
+        const words = content.toLowerCase()
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+            .split(/\s+/)
+            .filter(word => word.length > 2);
+        
+        if (words.length === 0) {
+            return { score: 0, factors: [] };
+        }
+
+        // Simple spelling check using common words
+        const misspelledWords = words.filter(word => !this.commonWords.has(word));
+        const errorDensity = misspelledWords.length / words.length;
+        
+        let score = 0;
+        let factors = [];
+
+        if (errorDensity > 0.7) { // If more than 70% of words are not in common words list
+            score = 40;
+            factors.push(`Extremely poor text quality (${misspelledWords.length} uncommon words)`);
+        } else if (errorDensity > 0.5) { // If more than 50% of words are not common
+            score = 25;
+            factors.push(`Poor text quality detected (${misspelledWords.length} uncommon words)`);
+        }
+        
+        // Check for excessive capitalization
+        const capsCount = (content.match(/[A-Z]/g) || []).length;
+        const capsRatio = capsCount / content.length;
+        if (capsRatio > 0.3 && content.length > 20) {
+            score += 20;
+            factors.push('Excessive capitalization detected');
+        }
+        
+        return { score, factors };
+    }
+
+    // --- CHARACTER SET ANALYSIS ---
+    _analyzeCharacterSets(content) {
+        if (!content) return { score: 0, factors: [] };
+
+        // Check for mixed character sets (potential homograph attack)
+        const hasLatin = /[a-zA-Z]/.test(content);
+        const hasCyrillic = /[\u0400-\u04FF]/.test(content);
+        const hasGreek = /[\u0370-\u03FF]/.test(content);
+        const hasArabic = /[\u0600-\u06FF]/.test(content);
+
+        let mixedSets = 0;
+        let factors = [];
+        
+        if (hasLatin) mixedSets++;
+        if (hasCyrillic) mixedSets++;
+        if (hasGreek) mixedSets++;
+        if (hasArabic) mixedSets++;
+
+        if (mixedSets > 1) {
+            return {
+                score: 50,
+                factors: ['Mixed character sets detected (potential homograph attack)']
+            };
+        }
+        
+        return { score: 0, factors: [] };
     }
 
     _checkPatterns(content, patterns, detectedPatterns) {
@@ -129,7 +239,7 @@ class ScamAnalyzer {
     }
 
     _formatResult(riskScore, detectedPatterns, content, contentType) {
-        const finalScore = Math.max(0, riskScore);
+        const finalScore = Math.max(0, Math.min(100, riskScore)); // Clamp between 0-100
         const level = this._calculateRiskLevel(finalScore);
         
         return {
@@ -172,135 +282,6 @@ class ScamAnalyzer {
     }
 }
 
-const dictionary = new Typo("en_US", null, null, {
-    dictionaryPath: "/path/to/your/dictionaries" // IMPORTANT: Update this path
-});
-
-class ScamAnalyzer {
-    constructor() {
-        // ... (all your existing patterns remain the same)
-        this.urlPatterns = [
-            // ...
-        ];
-        this.emailPatterns = [
-            // ...
-        ];
-        //...
-    }
-
-    // --- NEW METHOD for Spelling/Grammar ---
-    _analyzeTextQuality(content) {
-        if (!content || typeof content !== 'string') {
-            return { score: 0, factors: [] };
-        }
-
-        const words = content.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s/);
-        const misspelledWords = [];
-
-        words.forEach(word => {
-            if (word.length > 2 && !dictionary.check(word)) {
-                misspelledWords.push(word);
-            }
-        });
-        
-        const errorDensity = misspelledWords.length / words.length;
-        let score = 0;
-        let factors = [];
-
-        if (errorDensity > 0.15) { // If more than 15% of words are misspelled
-            score = 40;
-            factors.push(`Extremely poor spelling and grammar (${misspelledWords.length} errors)`);
-        } else if (errorDensity > 0.05) { // If more than 5% of words are misspelled
-            score = 25;
-            factors.push(`Multiple spelling mistakes detected (${misspelledWords.length} errors)`);
-        }
-        
-        return { score, factors };
-    }
-
-    // ... (your existing _analyzeUrl, etc. methods)
-
-    _analyzeEmail(emailContent) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-        // Original pattern check
-        riskScore += this._checkPatterns(emailContent, this.emailPatterns, detectedPatterns);
-        riskScore -= this._checkPatterns(emailContent, this.legitimatePatterns, []);
-        
-        // --- ADD THE NEW ANALYSIS ---
-        const qualityAnalysis = this._analyzeTextQuality(emailContent);
-        riskScore += qualityAnalysis.score;
-        detectedPatterns.push(...qualityAnalysis.factors);
-        
-        // Character analysis (from next section)
-        const charAnalysis = this._analyzeCharacterSets(emailContent);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
-
-        return this._formatResult(riskScore, detectedPatterns, emailContent, 'Email');
-    }
-
-    _analyzeMessage(message) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-        // Original pattern check
-        riskScore += this._checkPatterns(message, this.messagePatterns, detectedPatterns);
-        riskScore -= this._checkPatterns(message, this.legitimatePatterns, []);
-        
-        // --- ADD THE NEW ANALYSIS ---
-        const qualityAnalysis = this._analyzeTextQuality(message);
-        riskScore += qualityAnalysis.score;
-        detectedPatterns.push(...qualityAnalysis.factors);
-
-        // Character analysis (from next section)
-        const charAnalysis = this._analyzeCharacterSets(message);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
-        
-        return this._formatResult(riskScore, detectedPatterns, message, 'Message');
-    }
-    this.urlPatterns = [
-    // ... your existing urlPatterns
-    // --- ADD THIS NEW PATTERN ---
-    { pattern: /xn--/i, description: 'Punycode URL (potential impersonation)', score: 45 }
-    ];_analyzeCharacterSets(content) {
-        if (!content) return { score: 0, factors: [] };
-
-        // This regex checks for the presence of both Latin and Cyrillic characters
-        const hasLatin = /[a-zA-Z]/.test(content);
-        const hasCyrillic = /[\u0400-\u04FF]/.test(content);
-
-        if (hasLatin && hasCyrillic) {
-            return {
-                score: 50,
-                factors: ['Mixed character sets detected (potential homograph attack)']
-            };
-        }
-        return { score: 0, factors: [] };
-    }
-}
-    // ...
-    
-    // Make sure to call this new method inside _analyzeUrl, _analyzeEmail, etc.
-    // as shown in the updated _analyzeEmail and _analyzeMessage methods above.
-    _analyzeUrl(url) {
-        let riskScore = 0;
-        const detectedPatterns = [];
-        
-        // ... (your existing URL analysis code)
-        riskScore += this._checkPatterns(url, this.urlPatterns, detectedPatterns);
-
-        // --- ADD THE NEW CHARACTER ANALYSIS ---
-        const charAnalysis = this._analyzeCharacterSets(url);
-        riskScore += charAnalysis.score;
-        detectedPatterns.push(...charAnalysis.factors);
-
-        return this._formatResult(riskScore, detectedPatterns, url, 'URL');
-}
-
-
 // Analysis History Storage
 class AnalysisHistory {
     constructor() {
@@ -328,7 +309,9 @@ class AnalysisHistory {
                 history.splice(this.maxEntries);
             }
             
-            localStorage.setItem(this.storageKey, JSON.stringify(history));
+            // Use in-memory storage instead of localStorage to avoid browser restrictions
+            this._memoryStorage = history;
+            
             return analysis;
         } catch (error) {
             console.error('Error adding analysis to history:', error);
@@ -338,21 +321,44 @@ class AnalysisHistory {
 
     getHistory() {
         try {
+            // Try localStorage first, fallback to memory storage
             const stored = localStorage.getItem(this.storageKey);
-            return stored ? JSON.parse(stored) : [];
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return this._memoryStorage || [];
         } catch (error) {
             console.error('Error loading analysis history:', error);
-            return [];
+            return this._memoryStorage || [];
         }
     }
 
     clearHistory() {
         try {
             localStorage.removeItem(this.storageKey);
+            this._memoryStorage = [];
             return true;
         } catch (error) {
             console.error('Error clearing history:', error);
-            return false;
+            this._memoryStorage = [];
+            return true; // Still return true since memory was cleared
         }
     }
+
+    // Save to localStorage when possible
+    _saveToStorage(history) {
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(history));
+        } catch (error) {
+            console.warn('Could not save to localStorage, using memory storage only');
+        }
+    }
+}
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { ScamAnalyzer, AnalysisHistory };
+} else if (typeof window !== 'undefined') {
+    window.ScamAnalyzer = ScamAnalyzer;
+    window.AnalysisHistory = AnalysisHistory;
 }
