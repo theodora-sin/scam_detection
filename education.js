@@ -73,23 +73,11 @@ class EducationScreen {
         // This function should render all scam types without filtering
         const scamTypesList = document.getElementById('scam-types-list');
         if (!scamTypesList) return;
-        // Example scam types (replace with your actual data)
-        const scamTypes = [
-            { name: 'Phishing Email', description: 'Fake emails that try to steal your info.' },
-            { name: 'Tech Support Scam', description: 'Scammers pretend to be tech support.' },
-            { name: 'Lottery Scam', description: 'You “win” a lottery you never entered.' },
-            { name: 'Romance Scam', description: 'Fake relationships to steal money.' },
-            { name: 'Investment Scam', description: 'Fake investment opportunities.' },
-            { name: 'Charity Scam', description: 'Fake charities asking for donations.' },
-            { name: 'Impersonation Scam', description: 'Scammers pretend to be someone you know.' },
-            { name: 'Online Shopping Scam', description: 'Fake online stores or products.' },
-            { name: 'Job Offer Scam', description: 'Fake job offers to get your info or money.' },
-        ];
+        const scamTypes = this.getScamTypesData();
         scamTypesList.innerHTML = scamTypes.map(type =>
             `<div class="scam-type-card"><h4>${type.name}</h4><p>${type.description}</p></div>`
         ).join('');
     }
-
     searchScamTypes(query) {
         const resultsContainer = document.getElementById('scam-types-list');
         if (!resultsContainer) return;
