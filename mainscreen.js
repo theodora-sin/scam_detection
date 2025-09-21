@@ -82,7 +82,7 @@ class MainScreen {
                               analysis.risk_level === 'medium' ? 'medium' : 'low';
 
         resultsContainer.innerHTML = `
-            <div class="risk-assessment risk-${riskColorClass}">
+            <div class="risk-assessment risk-${riskColorClass}" style="background: transparent !important; box-shadow: none !important; border-radius: 0 !important;">
                 <h3>📊 Detailed Risk Assessment</h3>
                 <p><strong>Risk Level:</strong> ${(analysis.risk_level || analysis.level || 'unknown').toUpperCase()}</p>
                 <p><strong>Risk Score:</strong> ${analysis.risk_score || analysis.score || 0}/100</p>
