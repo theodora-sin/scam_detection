@@ -510,17 +510,26 @@ textarea {
     color: #d4edda;
 }
 
-
-
+.scam-types-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+    align-items: stretch;
+    margin-bottom: 2rem;
+}
 .scam-type-card {
-    /* background removed */
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 1rem;
+    min-width: 220px;
+    max-width: 320px;
+    flex: 1 1 220px;
+    margin-bottom: 0;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-        /* background removed */
+    background: none !important;
+    box-shadow: none !important;
 }
 
 .history-item {
