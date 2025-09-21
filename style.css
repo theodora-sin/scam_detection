@@ -1,3 +1,5 @@
+/* style.css */
+
 body {
     font-family: 'Inter', sans-serif !important;
     color: var(--foreground) !important;
@@ -11,6 +13,7 @@ body {
     -moz-osx-font-smoothing: grayscale !important;
 }
 
+/* ... the rest of the file remains the same */
 /* Make nav links horizontal and remove list-style */
 .nav-links, ul.nav-links {
     display: flex !important;
@@ -114,7 +117,7 @@ table, tr, td, th {
   --ring: hsl(180 100% 50%);
 }
 
-
+/* Removed duplicate body rule to prevent override of gradient and color */
 /* Make logo image always visible on any background */
 .logo img {
     background: transparent !important;
@@ -400,6 +403,15 @@ textarea {
     display: none;
 }
 
+.results-container code,
+.results-container .analyzed-content {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: inline;
+}
+
 .risk-assessment {
     padding: 1.5rem;
     border-radius: 8px;
@@ -554,6 +566,9 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
+
 
 
 
