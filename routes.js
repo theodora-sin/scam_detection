@@ -169,6 +169,11 @@ class ScamAnalyzer {
         };
     }
 
+    // Clamp the risk score between 0 and 100
+    _calculateFinalScore(baseScore, detectedPatterns) {
+        if (typeof baseScore !== 'number' || isNaN(baseScore)) return 0;
+        return Math.max(0, Math.min(100, Math.round(baseScore)));
+    }
     analyzeContent(content, contentType) {
         try {
             if (!content || !contentType) {
