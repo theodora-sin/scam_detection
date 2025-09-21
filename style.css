@@ -1,3 +1,14 @@
+/* Hide Email and Message radio buttons in content analysis form */
+#main-screen #analysis-email,
+#main-screen #analysis-message,
+#main-screen label[for="analysis-email"],
+#main-screen label[for="analysis-message"],
+#main-screen .radio-option input#analysis-email,
+#main-screen .radio-option input#analysis-message,
+#main-screen .radio-option label[for="analysis-email"],
+#main-screen .radio-option label[for="analysis-message"] {
+    display: none !important;
+}
 .scam-types-list {
     display: flex;
     flex-wrap: wrap;
