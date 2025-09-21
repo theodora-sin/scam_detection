@@ -1,25 +1,26 @@
-// Scam Analyzer Core Engine
 class ScamAnalyzer {
     constructor() {
+        // --- UPDATED URL PATTERNS WITH HIGHER SCORES ---
         this.urlPatterns = [
-            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 20 },
-            { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 30 },
-            { pattern: /(paypal|amazon|microsoft|apple|google).*-.*\.com/i, description: 'Suspicious domain mimicking legitimate service', score: 40 },
-            { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf)/i, description: 'Free domain hosting', score: 25 },
-            { pattern: /(secure|verify|update|confirm).*account/i, description: 'Account security keywords', score: 15 },
-            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 20 }
+            { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, description: 'Shortened URL', score: 30 }, // Increased from 20
+            { pattern: /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/, description: 'IP Address instead of domain', score: 40 }, // Increased from 30
+            { pattern: /(paypal|amazon|microsoft|apple|google).*-.*\.com/i, description: 'Suspicious domain mimicking legitimate service', score: 50 }, // Increased from 40
+            { pattern: /[a-z0-9]{8,}\.(tk|ml|ga|cf|xyz)/i, description: 'Free or suspicious domain hosting', score: 35 }, // Increased from 25
+            { pattern: /(secure|verify|update|confirm).*account/i, description: 'Account security keywords', score: 30 }, // Increased from 15
+            { pattern: /\d{4,}-\d{4,}-\d{4,}/, description: 'Suspicious subdomain pattern', score: 25 } // Increased from 20
         ];
         
+        // --- UPDATED EMAIL PATTERNS WITH HIGHER SCORES ---
         this.emailPatterns = [
-            { pattern: /urgent|immediate|act now|limited time|expires today/i, description: 'Urgency tactics', score: 25 },
-            { pattern: /verify your account|suspend|locked|frozen/i, description: 'Account threat language', score: 30 },
-            { pattern: /click here|download now|claim your prize/i, description: 'Suspicious call-to-action', score: 20 },
+            { pattern: /urgent|immediate|act now|limited time|expires today/i, description: 'Urgency tactics', score: 30 }, // Increased from 25
+            { pattern: /verify your account|suspend|locked|frozen/i, description: 'Account threat language', score: 35 }, // Increased from 30
+            { pattern: /click here|download now|claim your prize/i, description: 'Suspicious call-to-action', score: 25 }, // Increased from 20
             { pattern: /winner|congratulations|lottery|prize/i, description: 'Prize/lottery scam language', score: 35 },
             { pattern: /wire transfer|western union|moneygram|bitcoin/i, description: 'Unusual payment methods', score: 40 },
             { pattern: /dear (customer|sir|madam)/i, description: 'Generic greeting', score: 15 },
             { pattern: /[A-Z]{3,}\s+[A-Z]{3,}\s+[A-Z]{3,}/, description: 'Excessive capitalization', score: 10 },
             { pattern: /(\$|€|£)\s*\d{4,}/, description: 'Large money amounts', score: 20 },
-            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz)/i, description: 'Suspicious sender domain', score: 30 }
+            { pattern: /@[a-z0-9-]+\.(tk|ml|ga|cf|biz)/i, description: 'Suspicious sender domain', score: 35 } // Increased from 30
         ];
         
         this.messagePatterns = [
