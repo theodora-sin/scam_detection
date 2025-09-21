@@ -110,7 +110,6 @@ class EducationScreen {
                 
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
                     <small><strong>Severity:</strong> ${scam.severity.toUpperCase()}</small>
-                </div>
             </div>
         `).join('');
     }
@@ -131,6 +130,29 @@ class EducationScreen {
             </div>
         `;
 
+        const resources = [
+            {
+                name: "FTC Fraud Reports",
+                url: "https://reportfraud.ftc.gov/",
+                description: "Report fraud to the Federal Trade Commission"
+            },
+            {
+                name: "FBI IC3",
+                url: "https://www.ic3.gov/",
+                description: "Internet Crime Complaint Center"
+            },
+            {
+                name: "FTC Scam Alerts",
+                url: "https://www.consumer.ftc.gov/scam-alerts",
+                description: "Stay updated on latest scam alerts"
+            },
+            {
+                name: "AARP Fraud Watch",
+                url: "https://www.aarp.org/money/scams-fraud/",
+                description: "Resources and support for fraud victims"
+            }
+        ];
+
         resourcesContainer.innerHTML = warningSection + resources.map(resource => `
             <div class="card">
                 <h4><a href="${resource.url}" target="_blank" rel="noopener noreferrer">${resource.name} 🔗</a></h4>
@@ -142,7 +164,7 @@ class EducationScreen {
     getScamTypesData() {
         return [
             {
-                name:"Phishing Email",
+                name: "Phishing Email",
                 category: "Identity Theft",
                 description: "Fraudulent emails designed to steal personal information by impersonating legitimate organizations.",
                 warning_signs: "Urgent language, suspicious sender addresses, requests for personal information, poor grammar/spelling, generic greetings",
@@ -150,7 +172,7 @@ class EducationScreen {
                 severity: "high",
             },
             {
-                name:"Tech Support Scam",
+                name: "Tech Support Scam",
                 category: "Service Fraud",
                 description: "Scammers pose as technical support to gain remote access to computers or steal money.",
                 warning_signs: "Unsolicited calls about computer problems, requests for remote access, pressure to act immediately, requests for payment",
@@ -158,7 +180,7 @@ class EducationScreen {
                 severity: "high",
             },
             {
-                name:"Romance Scam",
+                name: "Romance Scam",
                 category: "Relationship Fraud",
                 description: "Criminals create fake romantic relationships online to manipulate victims into sending money.",
                 warning_signs: "Professes love quickly, avoids meeting in person, has emergencies requiring money, limited photos, stories don't add up",
@@ -166,7 +188,7 @@ class EducationScreen {
                 severity: "medium",
             },
             {
-                name:"Investment/Cryptocurrency Scam",
+                name: "Investment/Cryptocurrency Scam",
                 category: "Financial Fraud",
                 description: "Fraudulent investment opportunities promising unrealistic returns, often involving cryptocurrency.",
                 warning_signs: "Guaranteed high returns, pressure to invest quickly, unlicensed sellers, complex fee structures, celebrity endorsements",
@@ -174,7 +196,7 @@ class EducationScreen {
                 severity: "high",
             },
             {
-                name:"Online Shopping Scam",
+                name: "Online Shopping Scam",
                 category: "E-commerce Fraud",
                 description: "Fake online stores that take payment but never deliver goods, or sell counterfeit items.",
                 warning_signs: "Prices too good to be true, no contact information, poor website design, no customer reviews, payment only by wire transfer",
@@ -182,7 +204,7 @@ class EducationScreen {
                 severity: "medium",
             },
             {
-                name:"Social Security Scam",
+                name: "Social Security Scam",
                 category: "Government Impersonation",
                 description: "Criminals impersonate Social Security Administration officials to steal personal information or money.",
                 warning_signs: "Threats of arrest or legal action, demands for immediate payment, requests for Social Security number verification",
